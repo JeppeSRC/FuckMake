@@ -40,7 +40,7 @@ Link {
     %(LD) %(LFLAGS) -o MicroCode.elf %Input
 }
 
-Build:
+Build: 
     ExecuteList(Compile, %(CFiles), %(OutDir))
     ExecuteList(Assemble, %(ASMFiles), %(OutDir))
     Execute(Link,GetFiles(%(ObjDir)),)
@@ -78,7 +78,7 @@ There are two types of execute functions, [ExecuteList](#executelist) and [Execu
 
 #### Targets
 
-`Name:` Defines a target. A target is executed from the command line.
+`Name:` Defines a target. All targets must be at the end of the file.
 
 #### Functions
 
@@ -93,7 +93,7 @@ There are two types of execute functions, [ExecuteList](#executelist) and [Execu
 `GetFiles(Directory, Wildcards, Exclusions)` 
 
 -   `Directory` The root directory to start grabbing files in.
--   `Wildcards` You can use this to filter the files included. Example `*.c` will only include files that end with a `.c`. Multiple wildcards can be specified if seperated by a comma(`,`)
+-   `Wildcards` You can use this to filter the files included. Example `*.c` will only include files that end with a `.c`. Multiple wildcards can be specified if seperated by a space
 -   `Exclusions` Used to exclute files and subdirectories that gets included. Example `print.c` will exclude all files named `print.c` even if it gets included by the wildcard parameter.
 
 All parameters are optional, all files in the current directory will be included if all are left blank.
