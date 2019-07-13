@@ -1,4 +1,5 @@
 #include "string.h"
+#include "util.h"
 
 String::String() : str(nullptr), length(0) { }
 
@@ -112,6 +113,34 @@ String& String::Remove(uint64 start, uint64 end) {
 	return *this;
 }
 
+String& String::RemoveWhitespace() {
+	uint64 index = 0;
+
+	while ((index = Find('\n', index)) != ~0) {
+		Remove(index, index);
+	}
+
+	index = 0;
+
+	while ((index = Find('\r', index)) != ~0) {
+		Remove(index, index);
+	}
+
+	index = 0;
+
+	while ((index = Find('\t', index)) != ~0) {
+		Remove(index, index);
+	}
+
+	index = 0;
+
+	while ((index = Find(' ', index)) != ~0) {
+		Remove(index, index);
+	}
+
+	return *this;
+}
+
 uint64 String::Count(const String& string, uint64 offset, uint64 end) const {
 	return Count(string.str, offset, end);
 }
@@ -163,6 +192,19 @@ uint64 String::Find(const char character, uint64 offset) const {
 	return ~0;
 }
 
+uint64 String::FindOr(const char* characters, uint64 offset) const {
+	uint64 lowest = ~0;
+	uint64 len = strlen(characters);
+
+	for (uint64 i = 0; i < len; i++) {
+		uint64 index = Find(characters[i], offset);
+
+		index = index < lowest ? index : lowest;
+	}
+
+	return lowest;
+}
+
 uint64 String::FindReversed(const String& string, uint64 offset) const {
 	return FindReversed(string.str, offset);
 }
@@ -206,6 +248,19 @@ uint64 String::FindReversed(const char character, uint64 offset) const {
 	}
 
 	return ~0;
+}
+
+uint64 String::FindReversedOr(const char* characters, uint64 offset) const {
+	uint64 highest = ~0;
+	uint64 len = strlen(characters);
+
+	for (uint64 i = 0; i < len; i++) {
+		uint64 index = FindReversed(characters[i], offset);
+
+		index = index > highest ? index : highest;
+	}
+
+	return highest;
 }
 
 bool String::StartsWith(const String& string) const {

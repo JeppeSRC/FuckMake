@@ -2,7 +2,6 @@
 
 #include <memory>
 #include "list.h"
-#include "util.h"
 
 class String {
 public:
@@ -31,6 +30,7 @@ public:
 	String& Remove(const String& start, const String& end);
 	String& Remove(const char* const start, const char* const end);
 	String& Remove(uint64 start, uint64 end);
+	String& RemoveWhitespace();
 
 	//Counts how many strings is in the string
 	uint64 Count(const String& string, uint64 offset = 0, uint64 end = ~0) const;
@@ -40,11 +40,13 @@ public:
 	uint64 Find(const String& string, uint64 offset = 0) const;
 	uint64 Find(const char* const string, uint64 offset = 0) const;
 	uint64 Find(const char character, uint64 offset = 0) const;
+	uint64 FindOr(const char* characters, uint64 offset = 0) const;
 
 	//Finds the index of the string, if it exist (Starting from the end)
 	uint64 FindReversed(const String& string, uint64 offset = 0) const;
 	uint64 FindReversed(const char* const string, uint64 offset = 0) const;
 	uint64 FindReversed(const char string, uint64 offset = 0) const;
+	uint64 FindReversedOr(const char* characters, uint64 offset = 0) const;
 
 	//Tests if the string starts with string
 	bool StartsWith(const String& string) const;
