@@ -9,8 +9,8 @@ Example compiling [PowerSupply](https://github.com/JeppeSRC/PowerSupply)
 ```
 !FuckMake
 
-CFiles = GetFiles(src/, *.c)
-ASMFiles = GetFiles(src/, *.asm,*.s)
+CFiles = GetFiles(src/, *.c,)
+ASMFiles = GetFiles(src/, *.asm *.s,)
 
 IncludeDirs = src/
 
@@ -116,9 +116,9 @@ All parameters are optional, all files in the current directory will be included
 
 -   `Action` Specifies the actions to be executed.
 -   `Files` A List of files separeted by commas to be used as input files. This will be the contents of `%Input`.
--   `OutDir` Is a path to where the files shall be written.
+-   `OutDir` Is a path to where the files shall be written. This is the directory that will be in `%Output`.
 
-`Files` and `OutDir` are optional and may be left blank, if left blank files in the curret directory will be used as input files and the current directory will be used as output directory.
+`Files` and `OutDir` are optional and may be left blank, if left blank, all files in the curret directory and all sub-directories will be used as input files and the current directory will be used as output directory.
 
 Executes the action once for every file in the `Files` list.
 
