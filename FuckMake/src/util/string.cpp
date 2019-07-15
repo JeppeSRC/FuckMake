@@ -259,7 +259,7 @@ uint64 String::FindReversed(const char character, uint64 offset) const {
 }
 
 uint64 String::FindReversedOr(const char* characters, uint64 offset) const {
-	uint64 highest = 0;
+	int64 highest = ~0;
 	uint64 len = strlen(characters);
 
 	for (uint64 i = 0; i < len; i++) {
@@ -267,7 +267,7 @@ uint64 String::FindReversedOr(const char* characters, uint64 offset) const {
 
 		if (index == ~0) continue;
 
-		highest = index > highest ? index : highest;
+		highest = (int64)index > highest ? index : highest;
 	}
 
 	return highest;
