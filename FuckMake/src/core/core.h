@@ -5,7 +5,7 @@
 #ifdef DEBUG
 #define ASSERT(x) if (!(x)) {uint8* _abcd = 0; (*_abcd) = 0; printf("Assertion Failed: %s\n", #x);}
 #else
-#define ASSERT(x) x
+#define ASSERT(x)
 #endif
 
 typedef unsigned char uint8;

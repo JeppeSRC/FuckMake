@@ -9,44 +9,45 @@ Example compiling [PowerSupply](https://github.com/JeppeSRC/PowerSupply)
 ```
 !FuckMake
 
-CFiles = GetFiles(src/, *.c,)
-ASMFiles = GetFiles(src/, *.asm *.s,)
-
-IncludeDirs = src/
-
-OutDir = bin/%(config)/%(platform)/
-ObjDir = %(OutDir)obj/
-
 CC = arm-none-eabi-gcc
-LD = %(CC)
+LD =%(CC)
 AS = arm-none-eabi-as
 
-AFLAGS= -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
-CFLAGS= %(AFLAGS) -O3 -Wno-unknown-pragmas -Wno-nonnull-compare -Wall
-LFLAGS= -nostartfiles -nodefaultlibs -nostdlib -Wl,--gc-sections
+CFILES = GetFiles(src/,*.c,)
+ASMFILES = GetFiles(src/,*.asm,)
+
+INC = -Isrc
+
+OutDir = bin/
+ObjDir = %(OutDir)obj/
+
+AFLAGS = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+CFLAGS = %(AFLAGS) -O3 -Wno-unknown-pragmas -Wno-nonnull-compare -Wall
+LFLAGS = -nostartfiles -nodefaultlibs -nostdlib -Wl,--gc-sections --specs=nosys.specs -T"LinkerScript.ld"
+
 
 Compile {
     Msg(Compiling %Input)
-    %(CC) %(CFLAGS) -c -o %Output %Input
+    !%(CC) %(CFLAGS) %(INC) -c -o %Output %Input 
 }
 
 Assemble {
     Msg(Assembling %Input)
-    %(AS) %(CFLAGS) -c -o %Ouput %Input
+    !%(AS) %(AFLAGS) %(INC) -c -o %Output %Input
 }
 
 Link {
-    Msg(Linking)
-    %(LD) %(LFLAGS) -o MicroCode.elf %Input
+    Msg(Linking %Output)
+    !%(LD) %(LFLAGS) -o %Output %Input
 }
 
-Build: 
-    ExecuteList(Compile, %(CFiles), %(OutDir))
-    ExecuteList(Assemble, %(ASMFiles), %(OutDir))
-    Execute(Link,GetFiles(%(ObjDir)),)
+build:
+    ExecuteList(Compile, %(CFILES), %(ObjDir))
+    ExecuteList(Assemble, %(ASMFILES), %(ObjDir))
+    Execute(Link, GetFiles(%(ObjDir), *.obj,), %(OutDir)MicroCode.elf)
 
-Clean:
-    DeleteFiles(GetFiles(%(OutDir)))
+clean:
+    DeleteFiles(GetFiles(%(ObjDir),*.obj,))
 
 ```
 
@@ -72,13 +73,17 @@ Defines an action which can be executed with [Execute](#execute). Actions define
 
 `%Input` and `%Output` are built in variables that will be different depending on how the action is executed.
 
+`!` Tells FuckMake that it's a command line action.
+
 ##### Execute
 
 There are two types of execute functions, [ExecuteList](#executelist) and [Execute](#executesingle)
 
 #### Targets
 
-`Name:` Defines a target. All targets must be at the end of the file.
+`Name:` Defines a target. All targets must be at the end of the file. 
+
+`__default__` is a reserved target.
 
 #### Functions
 
@@ -118,8 +123,6 @@ All parameters are optional, all files in the current directory will be included
 -   `Files` A List of files separeted by commas to be used as input files. This will be the contents of `%Input`.
 -   `OutDir` Is a path to where the files shall be written. This is the directory that will be in `%Output`.
 
-`Files` and `OutDir` are optional and may be left blank, if left blank, all files in the curret directory and all sub-directories will be used as input files and the current directory will be used as output directory.
-
 Executes the action once for every file in the `Files` list.
 
 ##### Execute
@@ -129,7 +132,5 @@ Executes the action once for every file in the `Files` list.
 -   `Action` Same as [ExecuteList](#executelist)
 -   `Files` Same as [ExecuteList](#executelist)
 -   `OutDir` Same as [ExecuteList](#executelist)
-
-`Files` and `OutDir` are optional and may be left blank, if left blank files in the curret directory will be used as input files and the current directory will be used as output directory.
 
 Same as [ExecuteList](#executelist) except that it's only executed once and `%Input` will be a list of `Files` separated by spaces.

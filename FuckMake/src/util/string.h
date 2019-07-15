@@ -30,7 +30,7 @@ public:
 	String& Remove(const String& start, const String& end);
 	String& Remove(const char* const start, const char* const end);
 	String& Remove(uint64 start, uint64 end);
-	String& RemoveWhitespace();
+	String& RemoveWhitespace(bool onlyStartAndEnd = false);
 
 	//Counts how many strings is in the string
 	uint64 Count(const String& string, uint64 offset = 0, uint64 end = ~0) const;

@@ -113,29 +113,37 @@ String& String::Remove(uint64 start, uint64 end) {
 	return *this;
 }
 
-String& String::RemoveWhitespace() {
+String& String::RemoveWhitespace(bool only) {
 	uint64 index = 0;
+	if (!only) {
+		const char* list = "\n\r\t ";
+		for (uint64 i = 0; i < 4; i++) {
+			index = 0;
+			while ((index = Find(list[i], index)) != ~0) {
+				Remove(index, index);
+			}
+		}
+	} else {
+		uint64 index = ~0;
+		for (uint64 i = 0; i < length; i++) {
+			if (str[i] != ' ' && str[i] != '\n' && str[i] != '\r' && str[i] != '\t') {
+				index = i-1;
+				break;
+			}
+		}
+		
+		if (index != ~0) Remove(0, index);
 
-	while ((index = Find('\n', index)) != ~0) {
-		Remove(index, index);
-	}
+		index = ~0;
 
-	index = 0;
+		for (int64 i = length-1; i >= (int64)length; i--) {
+			if (str[i] != ' ' && str[i] != '\n' && str[i] != '\r' && str[i] != '\t') {
+				index = i + 1;
+				break;
+			}
+		}
 
-	while ((index = Find('\r', index)) != ~0) {
-		Remove(index, index);
-	}
-
-	index = 0;
-
-	while ((index = Find('\t', index)) != ~0) {
-		Remove(index, index);
-	}
-
-	index = 0;
-
-	while ((index = Find(' ', index)) != ~0) {
-		Remove(index, index);
+		if (index < length) Remove(index, length - 1);
 	}
 
 	return *this;
@@ -199,7 +207,7 @@ uint64 String::FindOr(const char* characters, uint64 offset) const {
 	for (uint64 i = 0; i < len; i++) {
 		uint64 index = Find(characters[i], offset);
 
-		index = index < lowest ? index : lowest;
+		lowest = index < lowest ? index : lowest;
 	}
 
 	return lowest;
@@ -219,7 +227,7 @@ uint64 String::FindReversed(const char* const string, uint64 offset) const {
 		offset = length - len;
 	}
 
-	for (uint64 i = offset; i >= 0; i--) {
+	for (uint64 i = offset; (int64)i >= 0; i--) {
 		bool match = true;
 		for (uint64 j = 0; j < len; j++) {
 			if (str[i + j] != string[j]) {
@@ -243,7 +251,7 @@ uint64 String::FindReversed(const char character, uint64 offset) const {
 		offset = length - 1;
 	}
 
-	for (uint64 i = offset; i >= 0; i--) {
+	for (uint64 i = offset; (int64)i >= 0; i--) {
 		if (str[i] == character) return i;
 	}
 
@@ -251,13 +259,15 @@ uint64 String::FindReversed(const char character, uint64 offset) const {
 }
 
 uint64 String::FindReversedOr(const char* characters, uint64 offset) const {
-	uint64 highest = ~0;
+	uint64 highest = 0;
 	uint64 len = strlen(characters);
 
 	for (uint64 i = 0; i < len; i++) {
 		uint64 index = FindReversed(characters[i], offset);
 
-		index = index > highest ? index : highest;
+		if (index == ~0) continue;
+
+		highest = index > highest ? index : highest;
 	}
 
 	return highest;
