@@ -36,14 +36,11 @@ uint8 WriteFile(const String& filename, const void* data, uint64 size) {
 	return 1;
 }
 
-inline int CreateDirectory(const String& path)
-{
 #ifdef _WIN32
-	return _mkdir(p.c_str());
+	#define CreateDirectory(dir) _mkdir(dir.str);
 #else
-	return mkdir(path.str, 0755);
+	#define CreateDirectory(dir) mkdir(dir.str, 0755);
 #endif
-}
 
 void CreateFolderAndFile(const String& filename) {
 	if (filename.Count("/") != 0) {
@@ -51,10 +48,10 @@ void CreateFolderAndFile(const String& filename) {
 
 		String path = folders[0] + "/";
 
-		CreateDirectory(path.str);
+		CreateDirectory(path);
 
 		for (uint64 i = 1; i < folders.GetCount() - 1; i++) {
-			CreateDirectory((path.Append(folders[i] + "/")).str);
+			CreateDirectory(path.Append(folders[i] + "/"));
 		}
 	}
 
@@ -71,7 +68,7 @@ List<FileInfo> ScanDirectory(const String& directory) {
 		/* print all the files and directories within directory */
 		while ((ent = readdir(dir)) != NULL) {
 			bool skip = ent->d_name[0] == '.' && (ent->d_name[1] == '\0' || ent->d_name[1] == '.'); // skip directory . & ..
-			if(ent->d_type == DT_DIR && !skip) ret.Add(ScanDirectory(String(directory + ent->d_name) + "/"));
+			if(ent->d_type == DT_DIR && !skip) ret.Add(ScanDirectory(directory + ent->d_name + "/"));
 			if(ent->d_type == DT_REG) ret.Add({ directory + ent->d_name });
 		}
 
@@ -135,9 +132,3 @@ void Log(LogLevel level, const char* message, ...) {
 
 	SetColor(COLOR_RESET);
 }
-
-#undef COLOR_INFO
-#undef COLOR_DEBUG
-#undef COLOR_WARNING
-#undef COLOR_ERROR
-#undef COLOR_RESET
