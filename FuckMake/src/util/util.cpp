@@ -1,10 +1,15 @@
 #include "util.h"
-#include <memory.h>
-#include <Windows.h>
 #include <stdarg.h>
+#include <sys/stat.h>
+#include <dirent.h>
 
 uint8* ReadFile(const String& filename, uint64* size) {
 	ASSERT(size != 0);
+
+	struct stat info;
+	*size = stat(filename.str, &info) < 0 ? 0 : info.st_size;
+
+	uint8* data = new uint8[*size];
 
 	FILE* file = fopen(filename.str, "rb");
 
@@ -12,16 +17,8 @@ uint8* ReadFile(const String& filename, uint64* size) {
 		return 0;
 	}
 
-	_fseeki64(file, 0, SEEK_SET);
-	_fseeki64(file, 0, SEEK_END);
-	*size = (uint64)_ftelli64(file);
-	_fseeki64(file, 0, SEEK_SET);
-
-	uint8* data = new uint8[*size];
-
 	fread(data, *size, 1, file);
 	fclose(file);
-
 
 	return data;
 }
@@ -39,104 +36,108 @@ uint8 WriteFile(const String& filename, const void* data, uint64 size) {
 	return 1;
 }
 
+inline int CreateDirectory(const String& path)
+{
+#ifdef _WIN32
+	return _mkdir(p.c_str());
+#else
+	return mkdir(path.str, 0755);
+#endif
+}
+
 void CreateFolderAndFile(const String& filename) {
-	if (filename.Count("/") == 0) {
-		CloseHandle(CreateFile(filename.str, GENERIC_READ | GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0));
-		return;
+	if (filename.Count("/") != 0) {
+		List<String> folders = filename.Split("/");
+
+		String path = folders[0] + "/";
+
+		CreateDirectory(path.str);
+
+		for (uint64 i = 1; i < folders.GetCount() - 1; i++) {
+			CreateDirectory((path.Append(folders[i] + "/")).str);
+		}
 	}
 
-	List<String> folders = filename.Split("/");
-
-	String path = folders[0] + "/";
-
-	CreateDirectory(path.str, 0);
-
-	for (uint64 i = 1; i < folders.GetCount() - 1; i++) {
-		CreateDirectory((path.Append(folders[i] + "/")).str, 0);
-	}
-
-	CloseHandle(CreateFile(path.Append(folders[folders.GetCount()-1]).str, GENERIC_READ | GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0));
+	FILE* file = fopen(filename.str, "w");
+	fclose(file);
 }
 
 List<FileInfo> ScanDirectory(const String& directory) {
-	WIN32_FIND_DATA fData;
-	HANDLE handle = FindFirstFile((directory + "*").str, &fData);
+	List<FileInfo> ret;
 
-	if (handle == INVALID_HANDLE_VALUE) {
-		//TODO:
-	}
-
-	List<FileInfo> files;
-
-	uint8 failCount = 0;
-
-	while (true) {
-		bool result = FindNextFile(handle, &fData);
-
-		if (!result) {
-			if (GetLastError() == ERROR_NO_MORE_FILES) {
-				break;
-			} else {
-				failCount++;
-
-				if (failCount == 10) {
-					break;
-				}
-
-				continue;
-			}
+	DIR *dir;
+	struct dirent *ent;
+	if((dir = opendir(directory.str)) != NULL) {
+		/* print all the files and directories within directory */
+		while ((ent = readdir(dir)) != NULL) {
+			bool skip = ent->d_name[0] == '.' && (ent->d_name[1] == '\0' || ent->d_name[1] == '.'); // skip directory . & ..
+			if(ent->d_type == DT_DIR && !skip) ret.Add(ScanDirectory(String(directory + ent->d_name) + "/"));
+			if(ent->d_type == DT_REG) ret.Add({ directory + ent->d_name });
 		}
 
-		if (fData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-			String dirName(fData.cFileName);
-			if (dirName == "." || dirName == "..") continue;
-
-			files.Add(ScanDirectory(directory + dirName + "/"));
-		} else {
-			FileInfo info;
-
-			info.filename = directory + fData.cFileName;
-
-			files.Add(info);
-		}
-
-		
+		closedir(dir);
 	}
 
-	FindClose(handle);
-
-	return files;
+	return ret;
 }
+
+#ifdef _WIN32
 
 #define COLOR_INFO 0b00001111
 #define COLOR_DEBUG 0b00001010
 #define COLOR_WARNING 0b00001110
 #define COLOR_ERROR 0b00001100
+#define COLOR_RESET 0b11111111
+
+void SetColor(WORD color) {
+	static WORD defaultAttributes = 0;
+
+	if(!defaultAttributes) {
+		CONSOLE_SCREEN_BUFFER_INFO info;
+		if(!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info)) return;
+		defaultAttributes = info.wAttributes;
+	}
+
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (color == COLOR_RESET ? defaultAttributes : color));
+}
+
+#else
+
+#define COLOR_INFO "\u001b[37m"
+#define COLOR_DEBUG "\u001b[32m"
+#define COLOR_WARNING "\u001b[33m"
+#define COLOR_ERROR "\u001b[31m"
+#define COLOR_RESET "\u001b[0m"
+
+void SetColor(const char* color) {
+	printf("%s", color);
+}
+#endif
 
 void Log(LogLevel level, const char* message, ...) {
 	va_list list;
 	va_start(list, message);
 
-	HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-
-	CONSOLE_SCREEN_BUFFER_INFO info;
-	GetConsoleScreenBufferInfo(h, &info);
-
 	switch (level) {
 	case LogLevel::Info:
-		SetConsoleTextAttribute(h, COLOR_INFO);
+		SetColor(COLOR_INFO);
 		break;
 	case LogLevel::Debug:
-		SetConsoleTextAttribute(h, COLOR_DEBUG);
+		SetColor(COLOR_DEBUG);
 		break;
 	case LogLevel::Error:
-		SetConsoleTextAttribute(h, COLOR_ERROR);
+		SetColor(COLOR_ERROR);
 		break;
 	}
 
 	vprintf(message, list);
-
-	SetConsoleTextAttribute(h, info.wAttributes);
-
 	printf("\n");
+
+	SetColor(COLOR_RESET);
 }
+
+#undef COLOR_INFO
+#undef COLOR_DEBUG
+#undef COLOR_WARNING
+#undef COLOR_ERROR
+#undef COLOR_RESET

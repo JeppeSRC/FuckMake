@@ -1,6 +1,5 @@
 #include "parsing.h"
 
-#include <Windows.h>
 #include <util/util.h>
 
 FuckMake::FuckMake(const String& filename, const String& target) {
@@ -311,7 +310,7 @@ void FuckMake::ProcessDeleteFiles(String& string) {
 	List<String> files = string.Split(" ");
 
 	for (uint64 i = 0; i < files.GetCount(); i++) {
-		DeleteFile(files[i].str);
+		::remove(files[i].str);
 	}
 }
 
