@@ -35,8 +35,8 @@ public:
 	String& RemoveWhitespace(bool onlyStartAndEnd = false);
 
 	//Counts how many strings is in the string
-	uint64 Count(const String& string, uint64 offset = 0, uint64 end = ~0) const;
-	uint64 Count(const char* const string, uint64 offset = 0, uint64 end = ~0) const;
+	uint64 Count(const String& string, uint64 offset = 0, uint64 end = String::npos) const;
+	uint64 Count(const char* const string, uint64 offset = 0, uint64 end = String::npos) const;
 
 	//Finds the index of the string, if it exist
 	uint64 Find(const String& string, uint64 offset = 0) const;

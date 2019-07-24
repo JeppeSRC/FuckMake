@@ -6,7 +6,7 @@ uint8* ReadFile(const String& filename, uint64* size) {
 	ASSERT(size != 0);
 
 	struct stat info;
-	*size = stat(filename.str, &info) < 0 ? 0 : info.st_size;
+	*size = stat(filename.str, &info) < 0 ? 0 : (uint64)info.st_size;
 
 	uint8* data = new uint8[*size];
 

@@ -139,9 +139,9 @@ String& String::RemoveWhitespace(bool only) {
 
 		index = String::npos;
 
-		for (int64 i = length-1; i >= (int64)length; i--) {
+		for (int64 i = (int64)length-1; i >= (int64)length; i--) {
 			if (str[i] != ' ' && str[i] != '\n' && str[i] != '\r' && str[i] != '\t') {
-				index = i + 1;
+				index = (uint64)i + 1;
 				break;
 			}
 		}
@@ -178,17 +178,17 @@ uint64 String::Find(const char* const string, uint64 offset) const {
 	ASSERT(string != nullptr);
 	uint64 len = strlen(string);
 
-	for (int64 i = offset; i < int64(length - (len - 1)); i++) {
+	for (int64 i = (int64)offset; i < int64(length - (len - 1)); i++) {
 		bool match = true;
 		for (uint64 j = 0; j < len; j++) {
-			if (str[i + j] != string[j]) {
+			if (str[(uint64)i + j] != string[j]) {
 				match = false;
 				break;
 			}
 		}
 
 		if (match) {
-			return i;
+			return (uint64)i;
 		}
 	}
 
@@ -262,7 +262,7 @@ uint64 String::FindReversed(const char character, uint64 offset) const {
 }
 
 uint64 String::FindReversedOr(const char* characters, uint64 offset) const {
-	int64 highest = String::npos;
+	int64 highest = (int64)~0;
 	uint64 len = strlen(characters);
 
 	for (uint64 i = 0; i < len; i++) {
@@ -270,10 +270,10 @@ uint64 String::FindReversedOr(const char* characters, uint64 offset) const {
 
 		if (index == String::npos) continue;
 
-		highest = (int64)index > highest ? index : highest;
+		highest = (int64)index > highest ? (int64)index : highest;
 	}
 
-	return highest;
+	return (uint64)highest;
 }
 
 bool String::StartsWith(const String& string) const {

@@ -352,7 +352,7 @@ public:
 			if (items[i] == item) return i;
 		}
 
-		return ~0;
+		return (uint64)~0;
 	}
 
 	template<typename K>
@@ -362,7 +362,7 @@ public:
 			if (CmpFunc(items[i], item)) return i;
 		}
 
-		return ~0;
+		return (uint64)~0;
 	}
 
 	inline T& operator[](uint64 index) {
