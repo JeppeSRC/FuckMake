@@ -1,5 +1,6 @@
 #include "string.h"
 #include "util.h"
+#include <memory.h>
 
 const uint64 String::npos = (uint64)~0;
 
