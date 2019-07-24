@@ -46,11 +46,9 @@ void CreateFolderAndFile(const String& filename) {
 	if (filename.Count("/") != 0) {
 		List<String> folders = filename.Split("/");
 
-		String path = folders[0] + "/";
+		String path = "";
 
-		CreateDirectory(path);
-
-		for (uint64 i = 1; i < folders.GetCount() - 1; i++) {
+		for (uint64 i = 0; i < folders.GetCount() - 1; i++) {
 			CreateDirectory(path.Append(folders[i] + "/"));
 		}
 	}
