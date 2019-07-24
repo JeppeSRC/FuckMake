@@ -46,7 +46,7 @@ void CreateFolderAndFile(const String& filename) {
 	if (filename.Count("/") != 0) {
 		List<String> folders = filename.Split("/");
 
-		String path = "";
+		String path("");
 
 		for (uint64 i = 0; i < folders.GetCount() - 1; i++) {
 			CreateDirectory(path.Append(folders[i] + "/"));
@@ -60,19 +60,19 @@ void CreateFolderAndFile(const String& filename) {
 List<FileInfo> ScanDirectory(const String& directory) {
 	List<FileInfo> ret;
 
-	DIR *dir;
-	struct dirent *ent;
-	if((dir = opendir(directory.str)) != NULL) {
-		/* print all the files and directories within directory */
-		while ((ent = readdir(dir)) != NULL) {
-			bool skip = ent->d_name[0] == '.' && (ent->d_name[1] == '\0' || ent->d_name[1] == '.'); // skip directory . & ..
-			if(ent->d_type == DT_DIR && !skip) ret.Add(ScanDirectory(directory + ent->d_name + "/"));
-			if(ent->d_type == DT_REG) ret.Add({ directory + ent->d_name });
-		}
+	DIR *dir = opendir(directory.str);
+	if (dir == NULL) return ret;
 
-		closedir(dir);
+	struct dirent *ent;
+	while ((ent = readdir(dir)) != NULL) {
+		String filename = ent->d_name;
+
+		if (filename == "." || filename == "..") continue; // skip directory . & ..
+		if (ent->d_type == DT_DIR) ret.Add(ScanDirectory(directory + filename + "/"));
+		if (ent->d_type == DT_REG) ret.Add({ directory + filename });
 	}
 
+	closedir(dir);
 	return ret;
 }
 
@@ -87,9 +87,9 @@ List<FileInfo> ScanDirectory(const String& directory) {
 void SetColor(WORD color) {
 	static WORD defaultAttributes = 0;
 
-	if(!defaultAttributes) {
+	if (!defaultAttributes) {
 		CONSOLE_SCREEN_BUFFER_INFO info;
-		if(!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info)) return;
+		if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &info)) return;
 		defaultAttributes = info.wAttributes;
 	}
 
