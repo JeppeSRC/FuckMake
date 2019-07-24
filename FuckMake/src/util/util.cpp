@@ -1,7 +1,6 @@
 #include "util.h"
 #include <stdarg.h>
 #include <sys/stat.h>
-#include <dirent.h>
 
 uint8* ReadFile(const String& filename, uint64* size) {
 	ASSERT(size != 0);
@@ -37,9 +36,10 @@ uint8 WriteFile(const String& filename, const void* data, uint64 size) {
 }
 
 #ifdef _WIN32
-	#define CreateDirectory(dir) _mkdir(dir.str);
+	#include "dirent.h"
 #else
-	#define CreateDirectory(dir) mkdir(dir.str, 0755);
+	#include <dirent.h>
+	#define CreateDirectory(dir, opts) mkdir(dir, 0755);
 #endif
 
 void CreateFolderAndFile(const String& filename) {
@@ -49,7 +49,7 @@ void CreateFolderAndFile(const String& filename) {
 		String path("");
 
 		for (uint64 i = 0; i < folders.GetCount() - 1; i++) {
-			CreateDirectory(path.Append(folders[i] + "/"));
+			(void)CreateDirectory(path.Append(folders[i] + "/").str, 0);
 		}
 	}
 
