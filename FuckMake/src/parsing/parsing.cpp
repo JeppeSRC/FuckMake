@@ -33,10 +33,10 @@ FuckMake::FuckMake(const String& filename, const String& target) {
 void FuckMake::Parse(String& string) {
 	uint64 fuckMakeStart = string.Find("!FuckMake");
 
-	if (fuckMakeStart == ~0) {
+	if (fuckMakeStart == String::npos) {
 		Log(LogLevel::Error, "Not a Fuckfile!");
 		exit(1);
-	} 
+	}
 
 	if (fuckMakeStart != 0) {
 		string.Remove(0, fuckMakeStart+9);
@@ -50,11 +50,11 @@ void FuckMake::Parse(String& string) {
 void FuckMake::ParseVariables(String& string) {
 	uint64 equalIndex = 0;
 
-	while ((equalIndex = string.Find('=')) != ~0) {
+	while ((equalIndex = string.Find('=')) != String::npos) {
 		uint64 start = string.FindReversed('\n', equalIndex) + 1;
 		uint64 end = string.Find('\n', equalIndex);
 
-		if (start == ~0 || end == ~0) {
+		if (start == String::npos || end == String::npos) {
 			Log(LogLevel::Error, "Error");
 			exit(1);
 		}
@@ -82,7 +82,7 @@ void FuckMake::ParseVariables(String& string) {
 void FuckMake::ParseActions(String& string) {
 	uint64 openBracket = 0;
 
-	while ((openBracket = string.Find('{')) != ~0) {
+	while ((openBracket = string.Find('{')) != String::npos) {
 		uint64 start = string.FindReversed('\n', openBracket)+1;
 		uint64 end = string.Find('}', openBracket);
 
@@ -104,11 +104,11 @@ void FuckMake::ParseActions(String& string) {
 void FuckMake::ParseTargets(String& string) {
 	uint64 colon = 0;
 
-	while ((colon = string.Find(':')) != ~0) {
+	while ((colon = string.Find(':')) != String::npos) {
 		uint64 start = string.FindReversed('\n', colon)+1;
 		uint64 end = string.Find(':', colon + 1);
 
-		if (end == ~0) {
+		if (end == String::npos) {
 			end = string.length - 1;
 		} else {
 			end = string.FindReversed('\n', end);
@@ -130,8 +130,8 @@ void FuckMake::ParseTargets(String& string) {
 
 void FuckMake::ProcessVariables(String& string) {
 	uint64 index = 0;
-	
-	while ((index = string.Find("%(")) != ~0) {
+
+	while ((index = string.Find("%(")) != String::npos) {
 		uint64 start = index;
 		uint64 end = string.Find(')', start);
 
@@ -151,7 +151,7 @@ void FuckMake::ProcessVariables(String& string) {
 void FuckMake::ProcessFunctions(String& string) {
 	uint64 parenthesis = 0;
 
-	while ((parenthesis = string.Find('(', parenthesis + 1)) != ~0) {
+	while ((parenthesis = string.Find('(', parenthesis + 1)) != String::npos) {
 		if (string[parenthesis - 1] == '%') continue;
 
 		uint64 start = string.FindReversedOr(" \n\r\t)(=,", parenthesis-1)+1;
@@ -183,11 +183,11 @@ void FuckMake::ProcessFunctions(String& string) {
 void FuckMake::ProcessInputOuput(String& string, const String& input, const String& output) {
 	uint64 index = 0;
 
-	while ((index = string.Find("%Input")) != ~0) {
+	while ((index = string.Find("%Input")) != String::npos) {
 		string.Insert(index, index+ 5, input);
 	}
 
-	while ((index = string.Find("%Output")) != ~0) {
+	while ((index = string.Find("%Output")) != String::npos) {
 		string.Insert(index, index + 6, output);
 	}
 }
@@ -195,7 +195,7 @@ void FuckMake::ProcessInputOuput(String& string, const String& input, const Stri
 bool FuckMake::CheckWildcardPattern(const String& source, const String& pattern) {
 	uint64 previous = pattern.Find('*');
 
-	if (previous == ~0) {
+	if (previous == String::npos) {
 		Log(LogLevel::Error, "Invalid wildcard \"%s\"", pattern.str);
 		exit(1);
 	}
@@ -227,7 +227,7 @@ bool FuckMake::CheckWildcardPattern(const String& source, const String& pattern)
 		for (uint64 i = 1; i < numAsterix; i++) {
 			String tmp = pattern.SubString(previous + 1, next - 1);
 
-			if ((offset = source.Find(tmp, offset)) == ~0) {
+			if ((offset = source.Find(tmp, offset)) == String::npos) {
 				break;
 			}
 
@@ -237,7 +237,7 @@ bool FuckMake::CheckWildcardPattern(const String& source, const String& pattern)
 			next = pattern.Find('*', previous + (i + 1 < numAsterix ? 1 : 0));
 		}
 
-		if (offset == ~0) return false;
+		if (offset == String::npos) return false;
 
 		if (next < pattern.length - 1) {
 			if (source.EndsWith(pattern.SubString(next + 1, pattern.length - 1))) {
@@ -254,7 +254,7 @@ bool FuckMake::CheckWildcardPattern(const String& source, const String& pattern)
 void FuckMake::ProcessGetFiles(String& string) {
 	uint64 firstComma = string.Find(',');
 	uint64 secondComma = string.Find(',', firstComma + 1);
-	
+
 	String directory("*");
 	String wildcard;
 	String exclusion;
@@ -340,7 +340,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 
 	file = string.SubString(firstComma + 1, secondComma - 1);
 	outdir = string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
-	
+
 	if (!action) {
 		Log(LogLevel::Error, "No action named \"%s\"", a.str);
 		exit(1);
@@ -362,7 +362,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 
 			uint64 index = ac.Find('!');
 
-			if (index == ~0) continue;
+			if (index == String::npos) continue;
 
 			CreateFolderAndFile(tmp2.str);
 
@@ -404,7 +404,7 @@ void FuckMake::ProcessExecute(String& string) {
 
 		uint64 index = ac.Find('!');
 
-		if (index == ~0) continue;
+		if (index == String::npos) continue;
 
 		CreateFolderAndFile(outdir);
 
@@ -423,7 +423,7 @@ uint64 FuckMake::FindMatchingParenthesis(const String& string, uint64 start) {
 		}
 	}
 
-	return ~0;
+	return String::npos;
 }
 
 Variable* FuckMake::GetVariable(const String& name) {
