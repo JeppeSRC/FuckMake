@@ -44,5 +44,8 @@
     <ClInclude Include="src\util\list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\util\dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
