@@ -354,18 +354,22 @@ void FuckMake::ProcessExecuteList(String& string) {
 			String ac = actions[j];
 			ProcessVariables(ac);
 
-			String tmp = files[i].RemoveWhitespace(true);
-			String tmp2 = outdir + tmp + ".obj";
+			String file = files[i].RemoveWhitespace(true);
+			String outFile = outdir + file + ".obj";
 
-			ProcessInputOuput(ac, tmp, tmp2);
+			ProcessInputOuput(ac, file, outFile);
 			ProcessFunctions(ac);
 
 			uint64 index = ac.Find('!');
 
 			if (index == String::npos) continue;
 
-			CreateFolderAndFile(tmp2.str);
+			struct stat fInfo;
+			if (stat(outFile.str, &fInfo) < 0) {
 
+			} else {
+				CreateFolderAndFile(outFile.str);
+			}
 			system(ac.SubString(index + 1, ac.length-1).str);
 		}
 	}
