@@ -13,6 +13,7 @@ void CreateFolderAndFile(const String& filename);
 
 struct FileInfo {
 	String filename;
+	struct stat fInfo;
 };
 
 List<FileInfo> ScanDirectory(const String& directory);

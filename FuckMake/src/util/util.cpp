@@ -69,7 +69,14 @@ List<FileInfo> ScanDirectory(const String& directory) {
 
 		if (filename == "." || filename == "..") continue; // skip directory . & ..
 		if (ent->d_type == DT_DIR) ret.Add(ScanDirectory(directory + filename + "/"));
-		if (ent->d_type == DT_REG) ret.Add({ directory + filename });
+		if (ent->d_type == DT_REG) {
+			FileInfo f;
+			f.filename = directory + filename;
+			
+			stat(f.filename.str, &f.fInfo);
+
+			ret.Add(f);
+		}
 	}
 
 	closedir(dir);
