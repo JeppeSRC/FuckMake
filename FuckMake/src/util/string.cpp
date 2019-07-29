@@ -1,5 +1,8 @@
 #include "string.h"
 #include "util.h"
+#include <memory.h>
+
+const uint64 String::npos = (uint64)~0;
 
 String::String() : str(nullptr), length(0) { }
 
@@ -119,26 +122,26 @@ String& String::RemoveWhitespace(bool only) {
 		const char* list = "\n\r\t ";
 		for (uint64 i = 0; i < 4; i++) {
 			index = 0;
-			while ((index = Find(list[i], index)) != ~0) {
+			while ((index = Find(list[i], index)) != String::npos) {
 				Remove(index, index);
 			}
 		}
 	} else {
-		uint64 index = ~0;
+		uint64 index = String::npos;
 		for (uint64 i = 0; i < length; i++) {
 			if (str[i] != ' ' && str[i] != '\n' && str[i] != '\r' && str[i] != '\t') {
 				index = i-1;
 				break;
 			}
 		}
-		
-		if (index != ~0) Remove(0, index);
 
-		index = ~0;
+		if (index != String::npos) Remove(0, index);
 
-		for (int64 i = length-1; i >= (int64)length; i--) {
+		index = String::npos;
+
+		for (int64 i = (int64)length-1; i >= (int64)length; i--) {
 			if (str[i] != ' ' && str[i] != '\n' && str[i] != '\r' && str[i] != '\t') {
-				index = i + 1;
+				index = (uint64)i + 1;
 				break;
 			}
 		}
@@ -159,7 +162,7 @@ uint64 String::Count(const char* const string, uint64 offset, uint64 end) const 
 	uint64 index = offset - 1;
 	uint64 count = 0;
 
-	while ((index = Find(string, index + 1)) != ~0) {
+	while ((index = Find(string, index + 1)) != String::npos) {
 		if (index > end) break;
 		count++;
 	}
@@ -175,21 +178,21 @@ uint64 String::Find(const char* const string, uint64 offset) const {
 	ASSERT(string != nullptr);
 	uint64 len = strlen(string);
 
-	for (int64 i = offset; i < int64(length - (len - 1)); i++) {
+	for (int64 i = (int64)offset; i < int64(length - (len - 1)); i++) {
 		bool match = true;
 		for (uint64 j = 0; j < len; j++) {
-			if (str[i + j] != string[j]) {
+			if (str[(uint64)i + j] != string[j]) {
 				match = false;
 				break;
 			}
 		}
 
 		if (match) {
-			return i;
+			return (uint64)i;
 		}
 	}
 
-	return ~0;
+	return String::npos;
 }
 
 uint64 String::Find(const char character, uint64 offset) const {
@@ -197,11 +200,11 @@ uint64 String::Find(const char character, uint64 offset) const {
 		if (str[i] == character) return i;
 	}
 
-	return ~0;
+	return String::npos;
 }
 
 uint64 String::FindOr(const char* characters, uint64 offset) const {
-	uint64 lowest = ~0;
+	uint64 lowest = String::npos;
 	uint64 len = strlen(characters);
 
 	for (uint64 i = 0; i < len; i++) {
@@ -241,7 +244,7 @@ uint64 String::FindReversed(const char* const string, uint64 offset) const {
 		}
 	}
 
-	return ~0;
+	return String::npos;
 }
 
 uint64 String::FindReversed(const char character, uint64 offset) const {
@@ -255,22 +258,22 @@ uint64 String::FindReversed(const char character, uint64 offset) const {
 		if (str[i] == character) return i;
 	}
 
-	return ~0;
+	return String::npos;
 }
 
 uint64 String::FindReversedOr(const char* characters, uint64 offset) const {
-	int64 highest = ~0;
+	int64 highest = (int64)~0;
 	uint64 len = strlen(characters);
 
 	for (uint64 i = 0; i < len; i++) {
 		uint64 index = FindReversed(characters[i], offset);
 
-		if (index == ~0) continue;
+		if (index == String::npos) continue;
 
-		highest = (int64)index > highest ? index : highest;
+		highest = (int64)index > highest ? (int64)index : highest;
 	}
 
-	return highest;
+	return (uint64)highest;
 }
 
 bool String::StartsWith(const String& string) const {
@@ -310,7 +313,7 @@ bool String::EndsWith(const char* const string) const {
 }
 
 String String::SubString(uint64 start, uint64 end) const {
-	ASSERT(start != ~0 && end != ~0);
+	ASSERT(start != String::npos && end != String::npos);
 	ASSERT(end >= start);
 
 	uint64 len = end - start + 1;
@@ -329,8 +332,8 @@ String String::SubString(const char* const start, const char* const end) const {
 	return SubString(Find(start), Find(end));
 }
 
-List<String> String::Split(const String& delimiters, bool includeEmtyLines) const {
-	return Split(delimiters.str);
+List<String> String::Split(const String& delimiters, bool includeEmptyLines) const {
+	return Split(delimiters.str, includeEmptyLines);
 }
 
 void String::Insert(uint64 start, uint64 end, const String& string) {
@@ -357,7 +360,7 @@ void String::Insert(uint64 start, uint64 end, const char* const string) {
 	delete[] tmp;
 }
 
-List<String> String::Split(const char* const delimiters, bool includeEmtyLines) const {
+List<String> String::Split(const char* const delimiters, bool includeEmptyLines) const {
 	List<String> list;
 
 	uint64 numDelimiters = strlen(delimiters);
@@ -368,7 +371,7 @@ List<String> String::Split(const char* const delimiters, bool includeEmtyLines) 
 		for (uint64 j = 0; j < numDelimiters; j++) {
 			if (str[i] == delimiters[j]) {
 				if (lastIndex == i - 1 || lastIndex == i) {
-					if (includeEmtyLines) {
+					if (includeEmptyLines) {
 						list.Add(String(""));
 						lastIndex++;
 					}

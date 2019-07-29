@@ -9,6 +9,8 @@ public:
 
 	uint64 length;
 
+	static const uint64 npos;
+
 public:
 	String();
 	String(const char* const string);
@@ -33,8 +35,8 @@ public:
 	String& RemoveWhitespace(bool onlyStartAndEnd = false);
 
 	//Counts how many strings is in the string
-	uint64 Count(const String& string, uint64 offset = 0, uint64 end = ~0) const;
-	uint64 Count(const char* const string, uint64 offset = 0, uint64 end = ~0) const;
+	uint64 Count(const String& string, uint64 offset = 0, uint64 end = String::npos) const;
+	uint64 Count(const char* const string, uint64 offset = 0, uint64 end = String::npos) const;
 
 	//Finds the index of the string, if it exist
 	uint64 Find(const String& string, uint64 offset = 0) const;
@@ -66,8 +68,8 @@ public:
 	void Insert(uint64 start, uint64 end, const String& string);
 	void Insert(uint64 start, uint64 end, const char* const string);
 
-	List<String> Split(const String& delimiters, bool includeEmtyLines = false) const;
-	List<String> Split(const char* const delimiters, bool includeEmtyLines = false) const;
+	List<String> Split(const String& delimiters, bool includeEmptyLines = false) const;
+	List<String> Split(const char* const delimiters, bool includeEmptyLines = false) const;
 
 	char& operator[](uint64 index);
 	char operator[](uint64 index) const;
