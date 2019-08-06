@@ -367,9 +367,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 
 		struct stat fInfo;
 		if (stat(outFile.str, &fInfo) >= 0) {
-			if (file[i].fInfo.st_mtime <= fInfo.st_mtime) {
-				continue;
-			}
+			if (file[i].fInfo.st_mtime <= fInfo.st_mtime) continue;
 		} else {
 			CreateFolderAndFile(outFile.str);
 		}
