@@ -277,13 +277,13 @@ void FuckMake::ProcessGetFiles(String& string) {
 
 	string.Remove(0, string.length - 1);
 
-	List<FileInfo> files = ScanDirectory(directory);
+	List<String> files = ScanDirectory(directory);
 
 	List<String> wildcards = wildcard.Split(" ");
 	List<String> exclusions = exclusion.Split(" ");
 
 	for (uint64 i = 0; i < files.GetCount(); i++) {
-		String& file = files[i].filename;
+		String& file = files[i];
 
 		bool included = false;
 
