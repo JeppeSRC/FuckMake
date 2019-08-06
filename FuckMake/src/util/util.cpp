@@ -57,8 +57,8 @@ void CreateFolderAndFile(const String& filename) {
 	fclose(file);
 }
 
-List<FileInfo> ScanDirectory(const String& directory) {
-	List<FileInfo> ret;
+List<String> ScanDirectory(const String& directory) {
+	List<String> ret;
 
 	DIR *dir = opendir(directory.str);
 	if (dir == NULL) return ret;
@@ -69,14 +69,7 @@ List<FileInfo> ScanDirectory(const String& directory) {
 
 		if (filename == "." || filename == "..") continue; // skip directory . & ..
 		if (ent->d_type == DT_DIR) ret.Add(ScanDirectory(directory + filename + "/"));
-		if (ent->d_type == DT_REG) {
-			FileInfo f;
-			f.filename = directory + filename;
-			
-			stat(f.filename.str, &f.fInfo);
-
-			ret.Add(f);
-		}
+		if (ent->d_type == DT_REG) { ret.Add(directory + filename);	}
 	}
 
 	closedir(dir);

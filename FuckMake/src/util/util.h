@@ -11,12 +11,7 @@ uint8  WriteFile(const String& filename, const void* data, uint64 size);
 
 void CreateFolderAndFile(const String& filename);
 
-struct FileInfo {
-	String filename;
-	struct stat fInfo;
-};
-
-List<FileInfo> ScanDirectory(const String& directory);
+List<String> ScanDirectory(const String& directory);
 
 enum class LogLevel {
 	Info,
