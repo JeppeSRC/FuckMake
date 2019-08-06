@@ -407,9 +407,23 @@ void FuckMake::ProcessExecute(String& string) {
 		exit(1);
 	}
 
-
 	file = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
 	outdir = string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
+
+	List<FileInfo> files = GetFileInfo(file);
+
+	struct stat fInfo;
+	if (stat(outdir.str, &fInfo) >= 0) {
+		uint64 i;
+		for (i = 0; i < files.GetCount(); i++) {
+			if (files[i].fInfo.st_mtime > fInfo.st_mtime) break;
+		}
+
+		if (i == files.GetCount()) return;
+
+	} else {
+		CreateFolderAndFile(outdir);
+	}
 
 	if (!action) {
 		Log(LogLevel::Error, "No action named \"%s\"", a.str);
@@ -426,8 +440,6 @@ void FuckMake::ProcessExecute(String& string) {
 		uint64 index = ac.Find('!');
 
 		if (index == String::npos) continue;
-
-		CreateFolderAndFile(outdir);
 
 		system(ac.SubString(index + 1, ac.length - 1).str);
 	}
