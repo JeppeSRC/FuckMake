@@ -13,6 +13,13 @@ void CreateFolderAndFile(const String& filename);
 
 List<String> ScanDirectory(const String& directory);
 
+struct FileInfo {
+	String filename;
+	struct stat fInfo;
+};
+
+List<FileInfo> GetFileInfo(const String& files);
+
 enum class LogLevel {
 	Info,
 	Debug,

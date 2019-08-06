@@ -76,6 +76,25 @@ List<String> ScanDirectory(const String& directory) {
 	return ret;
 }
 
+List<FileInfo> GetFileInfo(const String& files) {
+	List<FileInfo> ret;
+	List<String> file = files.Split(" ");
+
+	for (uint64 i = 0; i < file.GetCount(); i++) {
+		FileInfo info;
+
+		info.filename = file[i].RemoveWhitespace(true);
+
+		if (stat(info.filename.str, &info.fInfo) < 0) {
+			Log(LogLevel::Error, "Could not get file info for file \"%s\"", info.filename.str);
+		}
+
+		ret.Add(info);
+	}
+
+	return ret;
+}
+
 #ifdef _WIN32
 
 #define COLOR_INFO 0b00001111

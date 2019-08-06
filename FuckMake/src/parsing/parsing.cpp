@@ -327,7 +327,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 	uint64 firstComma = string.Find(',');
 	uint64 secondComma = string.Find(',', firstComma + 1);
 
-	String file;
+	String files;
 	String outdir;
 
 	String a = string.SubString(0, firstComma - 1).RemoveWhitespace();
@@ -338,7 +338,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 		exit(1);
 	}
 
-	file = string.SubString(firstComma + 1, secondComma - 1);
+	files = string.SubString(firstComma + 1, secondComma - 1);
 	outdir = string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
 
 	if (!action) {
@@ -347,17 +347,16 @@ void FuckMake::ProcessExecuteList(String& string) {
 	}
 
 	List<String>& actions = action->actions;
-	List<String> files = file.Split(" ");
+	List<FileInfo> file = GetFileInfo(files);
 
-	for (uint64 i = 0; i < files.GetCount(); i++) {
+	for (uint64 i = 0; i < file.GetCount(); i++) {
 		for (uint64 j = 0; j < actions.GetCount(); j++) {
 			String ac = actions[j];
 			ProcessVariables(ac);
 
-			String file = files[i].RemoveWhitespace(true);
-			String outFile = outdir + file + ".obj";
+			String outFile = outdir + file[i].filename + ".obj";
 
-			ProcessInputOuput(ac, file, outFile);
+			ProcessInputOuput(ac, file[i].filename, outFile);
 			ProcessFunctions(ac);
 
 			uint64 index = ac.Find('!');
@@ -365,11 +364,14 @@ void FuckMake::ProcessExecuteList(String& string) {
 			if (index == String::npos) continue;
 
 			struct stat fInfo;
-			if (stat(outFile.str, &fInfo) < 0) {
-
+			if (stat(outFile.str, &fInfo) >= 0) {
+				if (file[i].fInfo.st_mtime <= fInfo.st_mtime) {
+					continue;
+				}
 			} else {
 				CreateFolderAndFile(outFile.str);
 			}
+
 			system(ac.SubString(index + 1, ac.length-1).str);
 		}
 	}
