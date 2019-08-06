@@ -350,27 +350,27 @@ void FuckMake::ProcessExecuteList(String& string) {
 	List<FileInfo> file = GetFileInfo(files);
 
 	for (uint64 i = 0; i < file.GetCount(); i++) {
+
+		String outFile = outdir + file[i].filename + ".obj";
+
+		struct stat fInfo;
+		if (stat(outFile.str, &fInfo) >= 0) {
+			if (file[i].fInfo.st_mtime <= fInfo.st_mtime) {
+				continue;
+			}
+		} else {
+			CreateFolderAndFile(outFile.str);
+		}
+
 		for (uint64 j = 0; j < actions.GetCount(); j++) {
 			String ac = actions[j];
 			ProcessVariables(ac);
-
-			String outFile = outdir + file[i].filename + ".obj";
-
 			ProcessInputOuput(ac, file[i].filename, outFile);
 			ProcessFunctions(ac);
 
 			uint64 index = ac.Find('!');
 
 			if (index == String::npos) continue;
-
-			struct stat fInfo;
-			if (stat(outFile.str, &fInfo) >= 0) {
-				if (file[i].fInfo.st_mtime <= fInfo.st_mtime) {
-					continue;
-				}
-			} else {
-				CreateFolderAndFile(outFile.str);
-			}
 
 			system(ac.SubString(index + 1, ac.length-1).str);
 		}
