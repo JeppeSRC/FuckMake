@@ -2,7 +2,8 @@
 
 #include <util/util.h>
 
-FuckMake::FuckMake(const String& filename, const String& target) {
+
+FuckMake::FuckMake(const String& filename, const String& target) : msgMutex(nullptr) {
 	uint64 size = 0;
 	uint8* data = ReadFile(filename.str, &size);
 
@@ -318,7 +319,14 @@ void FuckMake::ProcessMsg(String& string) {
 	ProcessVariables(string);
 	ProcessFunctions(string);
 
-	Log(LogLevel::Info, "%s", string.str);
+	if (msgMutex) {
+		omp_set_lock(&msgMutex);
+		Log(LogLevel::Info, "%s", string.str);
+		omp_unset_lock(&msgMutex);
+	} else {
+		Log(LogLevel::Info, "%s", string.str);
+	}
+
 
 	string.Remove(0, string.length - 1);
 }
@@ -349,8 +357,12 @@ void FuckMake::ProcessExecuteList(String& string) {
 	List<String>& actions = action->actions;
 	List<FileInfo> file = GetFileInfo(files);
 
-	for (uint64 i = 0; i < file.GetCount(); i++) {
+	uint64 count = file.GetCount();
 
+	omp_init_lock(&msgMutex);
+
+#pragma omp parallel for schedule(dynamic)
+	for (uint64 i = 0; i < count; i++) {
 		String outFile = outdir + file[i].filename + ".obj";
 
 		struct stat fInfo;
@@ -375,6 +387,9 @@ void FuckMake::ProcessExecuteList(String& string) {
 			system(ac.SubString(index + 1, ac.length-1).str);
 		}
 	}
+
+	omp_destroy_lock(&msgMutex);
+	msgMutex = nullptr;
 }
 
 void FuckMake::ProcessExecute(String& string) {

@@ -2,6 +2,7 @@
 
 #include <util/list.h>
 #include <util/string.h>
+#include <omp.h>
 
 
 struct Variable {
@@ -48,6 +49,8 @@ private:
 	Variable* GetVariable(const String& name);
 	Action* GetAction(const String& name);
 	Target* GetTarget(const String& name);
+
+	omp_lock_t msgMutex;
 
 public:
 	FuckMake(const String& filename, const String& target);
