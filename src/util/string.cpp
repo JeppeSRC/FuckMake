@@ -91,7 +91,7 @@ String& String::Append(const char* const string) {
 String& String::Remove(const String& string) {
 	uint64 start = Find(string);
 	if (start + string.length - 1 >= length) return *this;
-	return Remove(start, string.length - 1);
+	return Remove(start, start+string.length - 1);
 }
 
 String& String::Remove(const String& start, const String& end) {
