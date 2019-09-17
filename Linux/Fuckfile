@@ -1,10 +1,12 @@
 !FuckMake
 
+ROOT = ../
+
 CC = g++
 
-CFILES = GetFiles(../src/,*.cpp,)
+CFILES = GetFiles(src/,*.cpp,)
 
-OutDir = ../bin/
+OutDir = bin/
 ObjDir = %(OutDir)obj/
 
 CFLAGS = -O3 -fopenmp -Wall -fpermissive
@@ -23,3 +25,5 @@ Link {
 
 build:
     ExecuteList(Compile, %(CFILES), %(ObjDir))
+    Execute(Link, GetFiles(%(ObjDir),*.obj,))
+    
