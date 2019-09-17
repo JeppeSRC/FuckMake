@@ -30,3 +30,4 @@ enum class LogLevel {
 
 void Log(LogLevel level, const char* message, ...);
 
+String CalculateAbsolutePath(const String& root, const String& newPath);

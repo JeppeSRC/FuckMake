@@ -6,14 +6,13 @@
 
 
 int main(int argc, char** argv) {
-
 	String target("__default__");
 
 	if (argc == 2) {
 		target = argv[1];
 	}
 
-	FuckMake fMake("Fuckfile", target);
+	FuckMake fMake(argv[0], "Fuckfile", target);
 
 	return 0;
 }

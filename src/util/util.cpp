@@ -151,3 +151,37 @@ void Log(LogLevel level, const char* message, ...) {
 
 	SetColor(COLOR_RESET);
 }
+
+String CalculateAbsolutePath(const String& root, const String& newPath) {
+	String res = root + newPath;
+
+	uint64 index = 0;
+
+	while ((index = res.Find("../", 0)) != String::npos) {
+		uint64 start = res.FindReversedOr("/\\", index - 2);
+
+		if (start == String::npos) {
+			Log(LogLevel::Error, "Cannot step back one directory. \"%s\" is invalid", res.str);
+			exit(1);
+		}
+
+		res.Remove(start, index + 1);
+	}
+
+	index = 0;
+
+	while ((index = res.Find("..\\", index)) != String::npos) {
+		uint64 start = res.FindReversedOr("/\\", index - 2);
+
+		if (start == String::npos) {
+			Log(LogLevel::Error, "Cannot step back one directory. \"%s\" is invalid", res.str);
+			exit(1);
+		}
+
+		res.Remove(start, index + 1);
+
+		index = start - 1;
+	}
+
+	return res;
+}

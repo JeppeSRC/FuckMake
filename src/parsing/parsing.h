@@ -55,6 +55,7 @@ private:
 	omp_lock_t msgMutex;
 
 	String rootDir;
+	bool rootSet;
 public:
 	FuckMake(const String& rootDir, const String& filename, const String& target);
 };

@@ -2,7 +2,7 @@
 
 #include <util/util.h>
 
-FuckMake::FuckMake(const String& rootDir, const String& filename, const String& target) : rootDir(rootDir) {
+FuckMake::FuckMake(const String& rootDir, const String& filename, const String& target) : rootDir(rootDir), rootSet(false) {
 	omp_init_lock(&msgMutex);
 	uint64 size = 0;
 	uint8* data = ReadFile(filename.str, &size);
@@ -10,6 +10,15 @@ FuckMake::FuckMake(const String& rootDir, const String& filename, const String& 
 	variables.Reserve(1024);
 	actions.Reserve(1024);
 	targets.Reserve(1024);
+
+#ifdef _WIN32
+	uint64 len = rootDir.length-1;
+	this->rootDir.Remove(len-12,len);
+	this->rootDir.Append("/");
+#else
+	uint64 len = rootDir.length - 1;
+	this->rootDir.Remove(len - 7, len);
+#endif
 
 	InitializeBuiltinVaraibles();
 
@@ -67,14 +76,23 @@ void FuckMake::ParseVariables(String& string) {
 		Variable var;
 
 		var.name = string.SubString(start, equalIndex - 1).RemoveWhitespace();
-		var.value = string.SubString(equalIndex + 1, end - 1);
+		var.value = string.SubString(equalIndex + 1, end - 1).RemoveWhitespace(true);
 
 		ProcessVariables(var.value);
 		ProcessFunctions(var.value);
 
 		Variable* v = GetVariable(var.name);
 
-		if (v) {
+		if (var.name == "ROOT") {
+			if (!rootSet) {
+				rootDir = CalculateAbsolutePath(rootDir, var.value);
+				v->value = rootDir;
+				Log(LogLevel::Debug, "ROOT=\"%s\"", rootDir.str);
+				rootSet = true;
+			} else {
+				Log(LogLevel::Warning, "ROOT may only be set once and before any calls to functions depending on it");
+			}
+		} else if (v) {
 			Log(LogLevel::Warning, "Overriding value of variable \"%s\"", var.name.str);
 			v->value = var.value;
 		} else {
@@ -283,7 +301,7 @@ void FuckMake::ProcessGetFiles(String& string) {
 
 	string.Remove(0, string.length - 1);
 
-	List<String> files = ScanDirectory(directory);
+	List<String> files = ScanDirectory(rootDir + directory);
 
 	List<String> wildcards = wildcard.Split(" ");
 	List<String> exclusions = exclusion.Split(" ");
@@ -309,7 +327,7 @@ void FuckMake::ProcessGetFiles(String& string) {
 		}
 	}
 
-
+	rootSet = true;
 }
 
 void FuckMake::ProcessDeleteFiles(String& string) {
@@ -324,6 +342,8 @@ void FuckMake::ProcessMsg(String& string) {
 	ProcessVariables(string);
 	ProcessFunctions(string);
 	
+	string.Remove(rootDir);
+
 	omp_set_lock(&msgMutex);
 	Log(LogLevel::Info, "%s", string.str);
 	omp_unset_lock(&msgMutex);
@@ -347,7 +367,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 	}
 
 	files = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
-	outdir = string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
+	outdir = rootDir + string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
 
 	if (!action) {
 		Log(LogLevel::Error, "No action named \"%s\"", a.str);
@@ -361,7 +381,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 
 #pragma omp parallel for schedule(dynamic)
 	for (uint64 i = 0; i < count; i++) {
-		String outFile = outdir + file[i].filename + ".obj";
+		String outFile = outdir + String(file[i].filename).Remove(rootDir) + ".obj";
 
 		struct stat fInfo;
 		if (stat(outFile.str, &fInfo) >= 0) {
@@ -371,7 +391,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 		}
 
 		for (uint64 j = 0; j < actions.GetCount(); j++) {
-			String ac = actions[j];
+			String ac = actions[j].RemoveWhitespace(true);
 			ProcessVariables(ac);
 			ProcessInputOuput(ac, file[i].filename, outFile);
 			ProcessFunctions(ac);
@@ -401,7 +421,7 @@ void FuckMake::ProcessExecute(String& string) {
 	}
 
 	file = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
-	outdir = string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
+	outdir = rootDir + string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
 
 	List<FileInfo> files = GetFileInfo(file);
 
