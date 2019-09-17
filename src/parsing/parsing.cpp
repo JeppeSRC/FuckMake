@@ -2,8 +2,14 @@
 
 #include <util/util.h>
 
+#ifdef _WIN32
+#define CHECK_MUTEX(x) x
+#else
+#define CHECK_MUTEX(x) x->_lk
+#endif
 
-FuckMake::FuckMake(const String& filename, const String& target) : msgMutex(nullptr) {
+FuckMake::FuckMake(const String& filename, const String& target) {
+	memset(&msgMutex, 0, sizeof(omp_lock_t));
 	uint64 size = 0;
 	uint8* data = ReadFile(filename.str, &size);
 
@@ -318,8 +324,8 @@ void FuckMake::ProcessDeleteFiles(String& string) {
 void FuckMake::ProcessMsg(String& string) {
 	ProcessVariables(string);
 	ProcessFunctions(string);
-
-	if (msgMutex) {
+	
+	if (CHECK_MUTEX(msgMutex)) {
 		omp_set_lock(&msgMutex);
 		Log(LogLevel::Info, "%s", string.str);
 		omp_unset_lock(&msgMutex);
@@ -387,7 +393,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 	}
 
 	omp_destroy_lock(&msgMutex);
-	msgMutex = nullptr;
+	CHECK_MUTEX(msgMutex) = nullptr;
 }
 
 void FuckMake::ProcessExecute(String& string) {
