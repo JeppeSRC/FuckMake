@@ -65,7 +65,7 @@ clean:
 
 -   `ROOT`
 
-`ROOT`: ROOT specifies the root directory. For example if FuckMake is executed in dev/folder/ but your sources are in dev/, you can set dev/ as your root folder. This is useful because FuckMake really doesn't like /../ in it's paths GGWP. It may be set to whatever you want early in the script, if not it will contain the normal root directory ie dev/folder/.
+`ROOT`: ROOT specifies the root directory. For example if FuckMake is executed in dev/folder/ but your sources are in dev/, you can set ROOT to ../ which will make the root directory dev/. This is useful because FuckMake really doesn't like /../ in it's paths GGWP. It may be set to whatever you want early in the script, if not it will contain the normal root directory ie dev/folder/.
 
 ### Actions
 
