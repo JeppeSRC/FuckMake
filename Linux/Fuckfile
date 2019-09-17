@@ -1,2 +1,25 @@
 !FuckMake
 
+CC = g++
+
+CFILES = GetFiles(../src/,*.cpp,)
+
+OutDir = ../bin/
+ObjDir = %(OutDir)obj/
+
+CFLAGS = -O3 -fopenmp -Wall -fpermissive
+LFLAGS = -fopenmp
+
+
+Compile {
+    Msg(Compiling %Input)
+    !%(CC) %(CFLAGS) -c -o %Output %Input
+}
+
+Link {
+    Msg(Linking)
+    !%(CC) %(LFLAGS) -o %Output %Input 
+}
+
+build:
+    ExecuteList(Compile, %(CFILES), %(ObjDir))
