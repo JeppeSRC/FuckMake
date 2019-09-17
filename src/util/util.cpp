@@ -136,6 +136,9 @@ void Log(LogLevel level, const char* message, ...) {
 		SetColor(COLOR_INFO);
 		break;
 	case LogLevel::Debug:
+#ifndef _DEBUG
+		return;
+#endif
 		SetColor(COLOR_DEBUG);
 		break;
 	case LogLevel::Warning:
