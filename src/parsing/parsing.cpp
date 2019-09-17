@@ -67,18 +67,20 @@ void FuckMake::ParseVariables(String& string) {
 		var.name = string.SubString(start, equalIndex - 1).RemoveWhitespace();
 		var.value = string.SubString(equalIndex + 1, end - 1);
 
-		if (GetVariable(var.name)) {
-			Log(LogLevel::Error, "Variable \"%s\" already exist", var.name.str);
-			exit(1);
+		ProcessVariables(var.value);
+		ProcessFunctions(var.value);
+
+		Variable* v = GetVariable(var.name);
+
+		if (v) {
+			Log(LogLevel::Warning, "Overriding value of variable \"%s\"", var.name.str);
+			v->value = var.value;
+		} else {
+			variables.Add(var);
 		}
 
 		string.Remove(start, end - 1);
 		equalIndex = string.Find('=');
-
-		ProcessVariables(var.value);
-		ProcessFunctions(var.value);
-
-		variables.Add(var);
 	}
 }
 
