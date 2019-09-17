@@ -139,7 +139,7 @@ String& String::RemoveWhitespace(bool only) {
 
 		index = String::npos;
 
-		for (int64 i = (int64)length-1; i >= (int64)length; i--) {
+		for (int64 i = (int64)length-1; i > 0; i--) {
 			if (str[i] != ' ' && str[i] != '\n' && str[i] != '\r' && str[i] != '\t') {
 				index = (uint64)i + 1;
 				break;
