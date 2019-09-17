@@ -2,17 +2,11 @@
 
 #include <util/util.h>
 
-#ifdef _WIN32
-#define CHECK_MUTEX(x) x
-#else
-#define CHECK_MUTEX(x) x->_lk
-#endif
-
 FuckMake::FuckMake(const String& filename, const String& target) {
-	memset(&msgMutex, 0, sizeof(omp_lock_t));
+	omp_init_lock(&msgMutex);
 	uint64 size = 0;
 	uint8* data = ReadFile(filename.str, &size);
-
+	
 	variables.Reserve(1024);
 	actions.Reserve(1024);
 	targets.Reserve(1024);
@@ -35,6 +29,8 @@ FuckMake::FuckMake(const String& filename, const String& target) {
 		ProcessVariables(s);
 		ProcessFunctions(s);
 	}
+
+	omp_destroy_lock(&msgMutex);
 }
 
 void FuckMake::Parse(String& string) {
@@ -325,14 +321,9 @@ void FuckMake::ProcessMsg(String& string) {
 	ProcessVariables(string);
 	ProcessFunctions(string);
 	
-	if (CHECK_MUTEX(msgMutex)) {
-		omp_set_lock(&msgMutex);
-		Log(LogLevel::Info, "%s", string.str);
-		omp_unset_lock(&msgMutex);
-	} else {
-		Log(LogLevel::Info, "%s", string.str);
-	}
-
+	omp_set_lock(&msgMutex);
+	Log(LogLevel::Info, "%s", string.str);
+	omp_unset_lock(&msgMutex);
 
 	string.Remove(0, string.length - 1);
 }
@@ -365,8 +356,6 @@ void FuckMake::ProcessExecuteList(String& string) {
 
 	uint64 count = file.GetCount();
 
-	omp_init_lock(&msgMutex);
-
 #pragma omp parallel for schedule(dynamic)
 	for (uint64 i = 0; i < count; i++) {
 		String outFile = outdir + file[i].filename + ".obj";
@@ -391,9 +380,6 @@ void FuckMake::ProcessExecuteList(String& string) {
 			system(ac.SubString(index + 1, ac.length-1).str);
 		}
 	}
-
-	omp_destroy_lock(&msgMutex);
-	CHECK_MUTEX(msgMutex) = nullptr;
 }
 
 void FuckMake::ProcessExecute(String& string) {
