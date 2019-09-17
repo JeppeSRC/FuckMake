@@ -53,15 +53,15 @@ clean:
 
 ## Some form of explanation
 
-#### Beginning of file
+### Beginning of file
 `!FuckMake` Marks the start of the FuckFile (it's just there to say FUCK YOU MAKE one more time).
 
-#### Variables
+### Variables
 `Name = <something>` Defines a variable.
 
 `%(Name)` Is used to get the value of a variable.
 
-#### Actions
+### Actions
 
 ```
 Name {
@@ -75,17 +75,17 @@ Defines an action which can be executed with [Execute](#execute). Actions define
 
 `!` Tells FuckMake that it's a command line action.
 
-#### Execute
+### Execute
 
 There are two types of execute functions, [ExecuteList](#executelist) and [Execute](#executesingle)
 
-#### Targets
+### Targets
 
 `Name:` Defines a target. All targets must be at the end of the file. 
 
 `__default__` is a reserved target.
 
-#### Functions
+### Functions
 
 -   [`GetFiles`](#getfiles)
 -   [`DeleteFiles`](#deletefiles)
@@ -93,7 +93,7 @@ There are two types of execute functions, [ExecuteList](#executelist) and [Execu
 -   [`ExecuteList`](#executelist)
 -   [`Execute`](#executesingle)
 
-#### GetFiles
+### GetFiles
 
 `GetFiles(Directory, Wildcards, Exclusions)` 
 
@@ -103,19 +103,19 @@ There are two types of execute functions, [ExecuteList](#executelist) and [Execu
 
 All parameters are optional, all files in the current directory will be included if all are left blank.
 
-#### DeleteFiles
+### DeleteFiles
 
 `DeleteFiles(Files)`
 
 -   `Files` A list of files to be deleted.
 
-#### Msg
+### Msg
 
 `Msg(Message)`
 
 -   `Message` A message that will be printed when executed.
 
-#### ExecuteList
+### ExecuteList
 
 `ExecuteList(Action, Files, OutDir)`
 
@@ -125,7 +125,7 @@ All parameters are optional, all files in the current directory will be included
 
 Executes the action once for every file in the `Files` list. Except if the resulting file was modified after the input file, basically only files that needs to be for instance compiled will.
 
-#### Execute
+### Execute
 
 `Execute(Action, Files, OutDir)`
 
