@@ -7,6 +7,11 @@ FuckMake::FuckMake(const String& rootDir, const String& filename, const String& 
 	Log(LogLevel::Debug, "Loading Fuckfile");
 	uint64 size = 0;
 	uint8* data = ReadFile(filename.str, &size);
+
+	if (data == nullptr) {
+		Log(LogLevel::Error, "Failed to open Fuckfile");
+		exit(1);
+	}
 	
 	variables.Reserve(1024);
 	actions.Reserve(1024);
