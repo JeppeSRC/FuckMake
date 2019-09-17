@@ -1,6 +1,5 @@
 #include "util.h"
 #include <stdarg.h>
-#include <sys/stat.h>
 
 uint8* ReadFile(const String& filename, uint64* size) {
 	ASSERT(size != 0);

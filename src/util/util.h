@@ -2,6 +2,7 @@
 
 #include <core/core.h>
 #include <stdio.h>
+#include <sys/stat.h>
 #include "string.h"
 
 #define CLAMP(x, min, max) (x > max ? max : (x < min ? min : x))
