@@ -88,6 +88,11 @@ String& String::Append(const char* const string) {
 	return *this;
 }
 
+String& String::Remove(const String& string) {
+	uint64 start = Find(string);
+	return Remove(start, string.length - 1);
+}
+
 String& String::Remove(const String& start, const String& end) {
 	return Remove(Find(start), Find(end) + end.length - 1);
 }

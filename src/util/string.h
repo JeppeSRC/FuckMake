@@ -29,6 +29,7 @@ public:
 	String& Append(const char* const string);
 
 	//Removes part of a string
+	String& Remove(const String& string);
 	String& Remove(const String& start, const String& end);
 	String& Remove(const char* const start, const char* const end);
 	String& Remove(uint64 start, uint64 end);
