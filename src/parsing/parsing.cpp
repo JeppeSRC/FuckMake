@@ -345,7 +345,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 		exit(1);
 	}
 
-	files = string.SubString(firstComma + 1, secondComma - 1);
+	files = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
 	outdir = string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
 
 	if (!action) {
