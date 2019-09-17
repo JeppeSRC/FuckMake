@@ -46,12 +46,15 @@ private:
 
 	uint64 FindMatchingParenthesis(const String& string, uint64 start);
 
+	void InitializeBuiltinVaraibles();
+
 	Variable* GetVariable(const String& name);
 	Action* GetAction(const String& name);
 	Target* GetTarget(const String& name);
 
 	omp_lock_t msgMutex;
 
+	String rootDir;
 public:
-	FuckMake(const String& filename, const String& target);
+	FuckMake(const String& rootDir, const String& filename, const String& target);
 };

@@ -2,7 +2,7 @@
 
 #include <util/util.h>
 
-FuckMake::FuckMake(const String& filename, const String& target) {
+FuckMake::FuckMake(const String& rootDir, const String& filename, const String& target) : rootDir(rootDir) {
 	omp_init_lock(&msgMutex);
 	uint64 size = 0;
 	uint8* data = ReadFile(filename.str, &size);
@@ -10,6 +10,8 @@ FuckMake::FuckMake(const String& filename, const String& target) {
 	variables.Reserve(1024);
 	actions.Reserve(1024);
 	targets.Reserve(1024);
+
+	InitializeBuiltinVaraibles();
 
 	String string((const char* const)data, size);
 
@@ -448,6 +450,15 @@ uint64 FuckMake::FindMatchingParenthesis(const String& string, uint64 start) {
 	}
 
 	return String::npos;
+}
+
+void FuckMake::InitializeBuiltinVaraibles() {
+	Variable var;
+
+	var.name = "ROOT";
+	var.value = rootDir;
+
+	variables.Add(var);
 }
 
 Variable* FuckMake::GetVariable(const String& name) {
