@@ -47,7 +47,7 @@ public:
 	//Finds the index of the string, if it exist (Starting from the end)
 	uint64 FindReversed(const String& string, uint64 offset = 0) const;
 	uint64 FindReversed(const char* const string, uint64 offset = 0) const;
-	uint64 FindReversed(const char string, uint64 offset = 0) const;
+	uint64 FindReversed(const char character, uint64 offset = 0) const;
 	uint64 FindReversedOr(const char* characters, uint64 offset = 0) const;
 
 	//Tests if the string starts with string
