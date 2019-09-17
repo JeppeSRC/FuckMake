@@ -95,7 +95,6 @@ void FuckMake::ParseActions(String& string) {
 
 		ProcessVariables(tmpValue);
 
-
 		Action action;
 		action.name = string.SubString(start, openBracket - 1).RemoveWhitespace();
 		action.actions = tmpValue.Split("\n", false);
