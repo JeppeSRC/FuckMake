@@ -24,7 +24,9 @@ List<FileInfo> GetFileInfo(const String& files);
 enum class LogLevel {
 	Info,
 	Debug,
+	Warning,
 	Error
 };
 
 void Log(LogLevel level, const char* message, ...);
+
