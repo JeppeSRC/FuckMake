@@ -4,6 +4,7 @@
 
 FuckMake::FuckMake(const String& rootDir, const String& filename, const String& target) : rootDir(rootDir), rootSet(false) {
 	omp_init_lock(&msgMutex);
+	Log(LogLevel::Debug, "Loading Fuckfile");
 	uint64 size = 0;
 	uint8* data = ReadFile(filename.str, &size);
 	
@@ -24,6 +25,7 @@ FuckMake::FuckMake(const String& rootDir, const String& filename, const String& 
 
 	String string((const char* const)data, size);
 
+	Log(LogLevel::Debug, "Parsing...");
 	Parse(string);
 
 	Target* t = GetTarget(target);
@@ -35,6 +37,7 @@ FuckMake::FuckMake(const String& rootDir, const String& filename, const String& 
 
 	List<String>& ts = t->targets;
 
+	Log(LogLevel::Debug, "Executing target \"%s\"", t->name.str);
 	for (uint64 i = 0; i < ts.GetCount(); i++) {
 		String s = ts[i];
 		ProcessVariables(s);
@@ -97,6 +100,7 @@ void FuckMake::ParseVariables(String& string) {
 			v->value = var.value;
 		} else {
 			variables.Add(var);
+			Log(LogLevel::Debug, "Found variable \"%s\" -> \"%s\"", var.name.str, var.value.str);
 		}
 
 		string.Remove(start, end - 1);
@@ -122,6 +126,7 @@ void FuckMake::ParseActions(String& string) {
 		string.Remove(start, end);
 
 		actions.Add(action);
+		Log(LogLevel::Debug, "Found action \"%s\"", action.name.str);
 	}
 }
 
@@ -149,6 +154,7 @@ void FuckMake::ParseTargets(String& string) {
 		string.Remove(start, end);
 
 		targets.Add(target);
+		Log(LogLevel::Debug, "Found target \"%s\"", target.name.str);
 	}
 }
 
@@ -303,6 +309,8 @@ void FuckMake::ProcessGetFiles(String& string) {
 
 	List<String> files = ScanDirectory(rootDir + directory);
 
+	Log(LogLevel::Debug, "GetFiles(%s,%s,%s):", directory.str, wildcard.str, exclusion.str);
+
 	List<String> wildcards = wildcard.Split(" ");
 	List<String> exclusions = exclusion.Split(" ");
 
@@ -323,7 +331,10 @@ void FuckMake::ProcessGetFiles(String& string) {
 				if (CheckWildcardPattern(file, exclusions[j])) included = false;
 			}
 
-			if (included) string.Append(file + " ");
+			if (included) {
+				string.Append(file + " ");
+				Log(LogLevel::Debug, "\t%s", file.str);
+			}
 		}
 	}
 
@@ -333,8 +344,11 @@ void FuckMake::ProcessGetFiles(String& string) {
 void FuckMake::ProcessDeleteFiles(String& string) {
 	List<String> files = string.Split(" ");
 
+	Log(LogLevel::Debug, "Deleting:");
+
 	for (uint64 i = 0; i < files.GetCount(); i++) {
 		::remove(files[i].str);
+		Log(LogLevel::Debug, "\t%s", files[i].str);
 	}
 }
 

@@ -12,6 +12,8 @@ int main(int argc, char** argv) {
 		target = argv[1];
 	}
 
+	Log(LogLevel::Debug, "Starting FuckMake");
+
 	FuckMake fMake(argv[0], "Fuckfile", target);
 
 	return 0;
