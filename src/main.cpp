@@ -4,12 +4,6 @@
 #include <parsing/parsing.h>
 #include <util/util.h>
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <unistd.h>
-#endif
-
 int main(int argc, char** argv) {
 	String target("__default__");
 

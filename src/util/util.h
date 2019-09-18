@@ -5,6 +5,12 @@
 #include <sys/stat.h>
 #include "string.h"
 
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+
 #define CLAMP(x, min, max) (x > max ? max : (x < min ? min : x))
 
 uint8* ReadFile(const String& filename, uint64* size);

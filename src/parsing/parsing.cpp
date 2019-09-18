@@ -86,6 +86,11 @@ void FuckMake::ParseVariables(String& string) {
 			if (!rootSet) {
 				rootDir = CalculateAbsolutePath(rootDir, var.value);
 				v->value = rootDir;
+#ifdef _WIN32
+				SetCurrentDirectory(rootDir.str);
+#else
+				chdir(rootDir.str);
+#endif
 				Log(LogLevel::Debug, "ROOT=\"%s\"", rootDir.str);
 				rootSet = true;
 			} else {
@@ -311,9 +316,9 @@ void FuckMake::ProcessGetFiles(String& string) {
 
 	string.Remove(0, string.length - 1);
 
-	List<String> files = ScanDirectory(rootDir + directory);
+	List<String> files = ScanDirectory(directory);
 
-	Log(LogLevel::Debug, "GetFiles(%s,%s,%s):", (rootDir + directory).str, wildcard.str, exclusion.str);
+	Log(LogLevel::Debug, "GetFiles(%s,%s,%s):", directory.str, wildcard.str, exclusion.str);
 
 	List<String> wildcards = wildcard.Split(" ");
 	List<String> exclusions = exclusion.Split(" ");
@@ -360,8 +365,6 @@ void FuckMake::ProcessMsg(String& string) {
 	ProcessVariables(string);
 	ProcessFunctions(string);
 	
-	string.Remove(rootDir);
-
 	omp_set_lock(&msgMutex);
 	Log(LogLevel::Info, "%s", string.str);
 	omp_unset_lock(&msgMutex);
@@ -385,7 +388,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 	}
 
 	files = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
-	outdir = rootDir + string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
+	outdir = string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
 
 	Log(LogLevel::Debug, "ExecuteList(%s,%s,%s)", a.str, files.str, outdir.str);
 
@@ -401,7 +404,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 
 #pragma omp parallel for schedule(dynamic)
 	for (uint64 i = 0; i < count; i++) {
-		String outFile = outdir + String(file[i].filename).Remove(rootDir) + ".obj";
+		String outFile = outdir + file[i].filename + ".obj";
 
 		struct stat fInfo;
 		if (stat(outFile.str, &fInfo) >= 0) {
@@ -445,7 +448,7 @@ void FuckMake::ProcessExecute(String& string) {
 	}
 
 	file = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
-	outdir = rootDir + string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
+	outdir = string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
 
 	Log(LogLevel::Debug, "Execute(%s,%s,%s)", a.str, file.str, outdir.str);
 
