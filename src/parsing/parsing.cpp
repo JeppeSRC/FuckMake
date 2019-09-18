@@ -119,6 +119,10 @@ void FuckMake::ParseActions(String& string) {
 		action.name = string.SubString(start, openBracket - 1).RemoveWhitespace();
 		action.actions = tmpValue.Split("\n", false);
 
+		for (uint64 i = 0; i < action.actions.GetCount(); i++) {
+			action.actions[i].RemoveWhitespace(true);
+		}
+
 		string.Remove(start, end);
 
 		actions.Add(action);
@@ -407,7 +411,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 
 			
 		for (uint64 j = 0; j < actions.GetCount(); j++) {
-			String ac = actions[j].RemoveWhitespace(true);
+			String ac = actions[j];
 			ProcessVariables(ac);
 			ProcessInputOuput(ac, file[i].filename, outFile);
 			ProcessFunctions(ac);
@@ -472,7 +476,7 @@ void FuckMake::ProcessExecute(String& string) {
 		uint64 index = ac.Find('!');
 
 		if (index == String::npos) continue;
-		printf("%s\n", ac.SubString(index + 1, ac.length - 1).str);
+
 		system(ac.SubString(index + 1, ac.length - 1).str);
 	}
 }
