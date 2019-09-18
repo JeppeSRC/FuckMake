@@ -17,15 +17,6 @@ FuckMake::FuckMake(const String& rootDir, const String& filename, const String& 
 	actions.Reserve(1024);
 	targets.Reserve(1024);
 
-#ifdef _WIN32
-	uint64 len = rootDir.length-1;
-	this->rootDir.Remove(len-12,len);
-	this->rootDir.Append("/");
-#else
-	uint64 len = rootDir.length - 1;
-	this->rootDir.Remove(len - 7, len);
-#endif
-
 	InitializeBuiltinVaraibles();
 
 	String string((const char* const)data, size);
@@ -290,8 +281,8 @@ void FuckMake::ProcessGetFiles(String& string) {
 	uint64 firstComma = string.Find(',');
 	uint64 secondComma = string.Find(',', firstComma + 1);
 
-	String directory("*");
-	String wildcard;
+	String directory("");
+	String wildcard("*");
 	String exclusion;
 
 	if (firstComma > 0) {
@@ -299,14 +290,14 @@ void FuckMake::ProcessGetFiles(String& string) {
 	}
 
 	if (secondComma - firstComma > 1) {
-		wildcard = string.SubString(firstComma + 1, secondComma - 1);
+		wildcard = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
 	}
 
 	if (secondComma < string.length - 1) {
 		exclusion = string.SubString(secondComma + 1, string.length - 1);
 	}
 
-	if (!directory.EndsWith("/") && !directory.EndsWith("*")) {
+	if (!directory.EndsWith("/") && directory.length != 0) {
 		directory.Append("/");
 	}
 
@@ -388,6 +379,8 @@ void FuckMake::ProcessExecuteList(String& string) {
 	files = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
 	outdir = rootDir + string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
 
+	Log(LogLevel::Debug, "ExecuteList(%s,%s,%s)", a.str, files.str, outdir.str);
+
 	if (!action) {
 		Log(LogLevel::Error, "No action named \"%s\"", a.str);
 		exit(1);
@@ -404,7 +397,10 @@ void FuckMake::ProcessExecuteList(String& string) {
 
 		struct stat fInfo;
 		if (stat(outFile.str, &fInfo) >= 0) {
-			if (file[i].fInfo.st_mtime <= fInfo.st_mtime) continue;
+			if (file[i].fInfo.st_mtime <= fInfo.st_mtime) {
+				Log(LogLevel::Debug, "Skipping file \"%s\"", file[i].filename.str);
+				continue;
+			}
 		} else {
 			CreateFolderAndFile(outFile.str);
 		}
