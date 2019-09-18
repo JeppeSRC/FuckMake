@@ -83,7 +83,7 @@ Defines an action which can be executed with [Execute](#execute). Actions define
 
 ### Execute
 
-There are two types of execute functions, [ExecuteList](#executelist) and [Execute](#executesingle)
+There are two types of execute functions, [ExecuteList](#executelist) and [Execute](#execute)
 
 ### Targets
 
@@ -97,7 +97,7 @@ There are two types of execute functions, [ExecuteList](#executelist) and [Execu
 -   [`DeleteFiles`](#deletefiles)
 -   [`Msg`](#msg)
 -   [`ExecuteList`](#executelist)
--   [`Execute`](#executesingle)
+-   [`Execute`](#execute)
 
 ### GetFiles
 
