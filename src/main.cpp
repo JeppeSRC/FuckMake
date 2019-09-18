@@ -4,6 +4,10 @@
 #include <parsing/parsing.h>
 #include <util/util.h>
 
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#endif
 
 int main(int argc, char** argv) {
 	String target("__default__");
@@ -14,7 +18,20 @@ int main(int argc, char** argv) {
 
 	Log(LogLevel::Debug, "Starting FuckMake");
 
-	FuckMake fMake(argv[0], "Fuckfile", target);
+	char tmp[1024];
+
+#ifdef _WIN32
+	GetCurrentDirectory(1024, tmp);
+#else
+#endif
+
+	String path(tmp);
+
+	if (!path.EndsWith("/")) {
+		path.Append("/");
+	}
+
+	FuckMake fMake(path, "Fuckfile", target);
 
 	return 0;
 }
