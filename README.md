@@ -131,7 +131,7 @@ All parameters are optional, all files in the current directory will be included
 
 Executes the action once for every file in the `Files` list. Except if the resulting file was modified after the input file, basically only files that needs to be for instance compiled will.
 
-### Execute <a>executesingle</a>
+### <a id="executesingle"></a> Execute ###
 
 `Execute(Action, Files, OutDir)`
 
