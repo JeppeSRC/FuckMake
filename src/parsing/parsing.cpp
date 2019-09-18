@@ -151,6 +151,10 @@ void FuckMake::ParseTargets(String& string) {
 		target.name = string.SubString(start, colon - 1).RemoveWhitespace();
 		target.targets = tmpValue.Split("\n", false);
 
+		for (uint64 i = 0; i < target.targets.GetCount(); i++) {
+			target.targets[i].RemoveWhitespace(true);
+		}
+
 		string.Remove(start, end);
 
 		targets.Add(target);
