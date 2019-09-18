@@ -7,6 +7,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 #else
+#include <unistd.h>
 #endif
 
 int main(int argc, char** argv) {
@@ -23,6 +24,7 @@ int main(int argc, char** argv) {
 #ifdef _WIN32
 	GetCurrentDirectory(1024, tmp);
 #else
+	getcwd(tmp, 1024);
 #endif
 
 	String path(tmp);
