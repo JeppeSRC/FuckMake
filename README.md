@@ -83,7 +83,7 @@ Defines an action which can be executed with [Execute](#execute). Actions define
 
 ### Execute
 
-There are two types of execute functions, [ExecuteList](#executelist) and [Execute](#execute)
+There are two types of execute functions, [ExecuteList](#executelist) and [Execute](#executesingle)
 
 ### Targets
 
@@ -97,7 +97,7 @@ There are two types of execute functions, [ExecuteList](#executelist) and [Execu
 -   [`DeleteFiles`](#deletefiles)
 -   [`Msg`](#msg)
 -   [`ExecuteList`](#executelist)
--   [`Execute`](#execute)
+-   [`Execute`](#executesingle)
 
 ### GetFiles
 
@@ -131,7 +131,7 @@ All parameters are optional, all files in the current directory will be included
 
 Executes the action once for every file in the `Files` list. Except if the resulting file was modified after the input file, basically only files that needs to be for instance compiled will.
 
-### Execute
+### Execute <a>executesingle</a>
 
 `Execute(Action, Files, OutDir)`
 
