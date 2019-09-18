@@ -13,7 +13,6 @@ int main(int argc, char** argv) {
 	}
 
 	Log(LogLevel::Debug, "Starting FuckMake");
-	printf("%s\n", argv[0]);
 
 	FuckMake fMake(argv[0], "Fuckfile", target);
 
