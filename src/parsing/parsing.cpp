@@ -405,6 +405,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 			CreateFolderAndFile(outFile.str);
 		}
 
+			
 		for (uint64 j = 0; j < actions.GetCount(); j++) {
 			String ac = actions[j].RemoveWhitespace(true);
 			ProcessVariables(ac);
@@ -438,6 +439,8 @@ void FuckMake::ProcessExecute(String& string) {
 	file = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
 	outdir = rootDir + string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
 
+	Log(LogLevel::Debug, "Execute(%s,%s,%s)", a.str, file.str, outdir.str);
+
 	List<FileInfo> files = GetFileInfo(file);
 
 	struct stat fInfo;
@@ -459,6 +462,7 @@ void FuckMake::ProcessExecute(String& string) {
 	}
 
 	List<String>& actions = action->actions;
+	
 	for (uint64 i = 0; i < actions.GetCount(); i++) {
 		String ac = actions[i];
 		ProcessVariables(ac);
@@ -468,7 +472,7 @@ void FuckMake::ProcessExecute(String& string) {
 		uint64 index = ac.Find('!');
 
 		if (index == String::npos) continue;
-
+		printf("%s\n", ac.SubString(index + 1, ac.length - 1).str);
 		system(ac.SubString(index + 1, ac.length - 1).str);
 	}
 }
