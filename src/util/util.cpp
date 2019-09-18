@@ -47,6 +47,11 @@ void CreateFolderAndFile(const String& filename) {
 
 		String path("");
 
+#ifndef _WIN32
+		path.Append("/");
+#endif
+
+
 		for (uint64 i = 0; i < folders.GetCount() - 1; i++) {
 			(void)CreateDirectory(path.Append(folders[i] + "/").str, 0);
 		}
