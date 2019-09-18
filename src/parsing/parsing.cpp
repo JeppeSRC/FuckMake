@@ -314,7 +314,7 @@ void FuckMake::ProcessGetFiles(String& string) {
 
 	List<String> files = ScanDirectory(rootDir + directory);
 
-	Log(LogLevel::Debug, "GetFiles(%s,%s,%s):", directory.str, wildcard.str, exclusion.str);
+	Log(LogLevel::Debug, "GetFiles(%s,%s,%s):", (rootDir + directory).str, wildcard.str, exclusion.str);
 
 	List<String> wildcards = wildcard.Split(" ");
 	List<String> exclusions = exclusion.Split(" ");
