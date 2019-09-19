@@ -1,6 +1,6 @@
 # FuckMake
 
-FuckMake is a much simpler thing than make and it wont just suddenly take a dump in your face.
+FuckMake is a much simpler thing than make and it wont just suddenly take a dump in your face. You may use it if you're worthy!
 
 ## Example
 
