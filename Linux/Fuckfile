@@ -13,7 +13,7 @@ R_CFLAGS = -O3 -fopenmp -Wall -Wno-unused-result -fpermissive
 D_CFLAGS = -g -fopenmp -Wall -Wno-unused-result -fpermissive -D_DEBUG
 LFLAGS = -fopenmp
 
-INC = -I../src/
+INC = -Isrc/
 
 Compile_dbg {
     Msg(Compiling %Input)
