@@ -107,13 +107,15 @@ There are two types of execute functions, [ExecuteList](#executelist) and [Execu
 -   `Wildcards` You can use this to filter the files included. Example `*.c` will only include files that end with a `.c`. Multiple wildcards can be specified if seperated by a space
 -   `Exclusions` Used to exclute files and subdirectories that gets included. Example `print.c` will exclude all files named `print.c` even if it gets included by the wildcard parameter.
 
+The function returns a list of files separated by the pipe `|` character.
+
 All parameters are optional, all files in the current directory will be included if all are left blank.
 
 ### DeleteFiles
 
 `DeleteFiles(Files)`
 
--   `Files` A list of files to be deleted.
+-   `Files` A list of files separated by the pipe `|` charcter, to be deleted.
 
 ### Msg
 
@@ -126,7 +128,7 @@ All parameters are optional, all files in the current directory will be included
 `ExecuteList(Action, Files, OutDir)`
 
 -   `Action` Specifies the actions to be executed.
--   `Files` A List of files separeted by commas to be used as input files. This will be the contents of `%Input`.
+-   `Files` A List of files separeted by the pipe `|` character, to be used as input files. This will be the contents of `%Input`.
 -   `OutDir` Is a path to where the files shall be written. This is the directory that will be in `%Output`.
 
 Executes the action once for every file in the `Files` list. Except if the resulting file was modified after the input file, basically only files that needs to be for instance compiled will.

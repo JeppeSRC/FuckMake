@@ -341,7 +341,7 @@ void FuckMake::ProcessGetFiles(String& string) {
 			}
 
 			if (included) {
-				string.Append(file + " ");
+				string.Append(file + ",");
 				Log(LogLevel::Debug, "\t%s", file.str);
 			}
 		}
