@@ -347,6 +347,8 @@ void FuckMake::ProcessGetFiles(String& string) {
 		}
 	}
 
+	if (string.length > 1) string.Remove(string.length - 1, string.length - 1);
+
 	rootSet = true;
 }
 
