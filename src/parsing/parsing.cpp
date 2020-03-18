@@ -195,7 +195,11 @@ void FuckMake::ProcessFunctions(String& string) {
 
 		uint64 start = string.FindReversedOr(" \n\r\t)(=,", parenthesis-1)+1;
 
-		String functionName = string.SubString(start, parenthesis-1).RemoveWhitespace();
+		uint64 end = parenthesis - 1;
+
+		if (end <= start) continue;
+
+		String functionName = string.SubString(start, end).RemoveWhitespace();
 
 		uint64 closingParenthesis = FindMatchingParenthesis(string, parenthesis);
 
@@ -474,12 +478,18 @@ void FuckMake::ProcessExecute(String& string) {
 		exit(1);
 	}
 
+	String tmpFiles = "";
+
+	for (uint64 i = 0; i < files.GetCount(); i++) {
+		tmpFiles.Append(files[i].filename + " ");
+	}
+
 	List<String>& actions = action->actions;
 	
 	for (uint64 i = 0; i < actions.GetCount(); i++) {
 		String ac = actions[i];
 		ProcessVariables(ac);
-		ProcessInputOuput(ac, file, outdir);
+		ProcessInputOuput(ac, tmpFiles.RemoveWhitespace(true), outdir);
 		ProcessFunctions(ac);
 
 		uint64 index = ac.Find('!');

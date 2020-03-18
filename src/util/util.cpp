@@ -77,7 +77,7 @@ List<String> ScanDirectory(const String& directory) {
 
 List<FileInfo> GetFileInfo(const String& files) {
 	List<FileInfo> ret;
-	List<String> file = files.Split(" ");
+	List<String> file = files.Split("|");
 
 	for (uint64 i = 0; i < file.GetCount(); i++) {
 		FileInfo info;
