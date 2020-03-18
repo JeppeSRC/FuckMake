@@ -351,12 +351,12 @@ void FuckMake::ProcessGetFiles(String& string) {
 }
 
 void FuckMake::ProcessDeleteFiles(String& string) {
-	List<String> files = string.Split(" ");
+	List<String> files = string.Split("|");
 
 	Log(LogLevel::Debug, "Deleting:");
 
 	for (uint64 i = 0; i < files.GetCount(); i++) {
-		::remove(files[i].str);
+		::remove(files[i].RemoveWhitespace(true).str);
 		Log(LogLevel::Debug, "\t%s", files[i].str);
 	}
 }
