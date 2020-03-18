@@ -122,9 +122,9 @@ String& String::Remove(uint64 start, uint64 end) {
 	return *this;
 }
 
-String& String::RemoveWhitespace(bool only) {
+String& String::RemoveWhitespace(bool onlyStartAndEnd) {
 	uint64 index = 0;
-	if (!only) {
+	if (!onlyStartAndEnd) {
 		const char* list = "\n\r\t ";
 		for (uint64 i = 0; i < 4; i++) {
 			index = 0;
