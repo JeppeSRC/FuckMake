@@ -31,11 +31,11 @@ Link {
 }
 
 debug:
-    ExecuteList(Compile_dbg, %(CFILES), %(ObjDir)Debug/)
+    ExecuteList(Compile_dbg, %(CFILES), %(ObjDir)Debug/,src/)
     Execute(Link, GetFiles(%(ObjDir)/Debug/,*.obj,), %(OutDir)Debug/FuckMake)
 
 release:
-    ExecuteList(Compile, %(CFILES), %(ObjDir))
+    ExecuteList(Compile, %(CFILES), %(ObjDir),src/)
     Execute(Link, GetFiles(%(ObjDir),*.obj,*/Debug/*), %(OutDir)FuckMake)
 
 

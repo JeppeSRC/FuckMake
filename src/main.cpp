@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <core/core.h>
 
-#include <parsing/parsing.h>
+#include <core/fuckmake.h>
 #include <util/util.h>
 
 int main(int argc, char** argv) {
