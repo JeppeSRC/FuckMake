@@ -113,8 +113,6 @@ bool CheckIncludes(const String& filename, const List<String>& includeDirs, stru
 			String include = file.SubString(start + 1, end - 1);
 
 			if (CheckInclude(filename, include, includeDirs, outFile, true)) return true;
-		} else {
-			Error(filename);
 		}
 
 		file.Remove(index, newLine);
