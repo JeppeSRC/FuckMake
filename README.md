@@ -125,13 +125,16 @@ All parameters are optional, all files in the current directory will be included
 
 ### ExecuteList
 
-`ExecuteList(Action, Files, OutDir)`
+`ExecuteList(Action, Files, OutDir, IncludeDir)`
 
 -   `Action` Specifies the actions to be executed.
 -   `Files` A List of files separeted by the pipe `|` character, to be used as input files. This will be the contents of `%Input`.
 -   `OutDir` Is a path to where the files shall be written. This is the directory that will be in `%Output`.
+-   `IncludeDir` Is a list of include directories.
 
 Executes the action once for every file in the `Files` list. Except if the resulting file was modified after the input file, basically only files that needs to be for instance compiled will.
+<br></br>
+If `IncludeDir` contains the list of include directories it will scan source files for changes in headers.
 
 ### <a id="executesingle"></a> Execute ###
 
