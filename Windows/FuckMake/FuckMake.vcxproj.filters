@@ -2,14 +2,14 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp" />
-    <ClCompile Include="..\..\src\parsing\parsing.cpp">
-      <Filter>parsing</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\util\string.cpp">
       <Filter>util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\util\util.cpp">
       <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\core\fuckmake.cpp">
+      <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -27,9 +27,6 @@
     <ClInclude Include="..\..\src\core\core.h">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\parsing\parsing.h">
-      <Filter>parsing</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\util\dirent.h">
       <Filter>util</Filter>
     </ClInclude>
@@ -41,6 +38,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\util\util.h">
       <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\core\fuckmake.h">
+      <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

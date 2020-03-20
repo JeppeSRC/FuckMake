@@ -11,14 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\core\fuckmake.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
-    <ClCompile Include="..\..\src\parsing\parsing.cpp" />
     <ClCompile Include="..\..\src\util\string.cpp" />
     <ClCompile Include="..\..\src\util\util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\core\core.h" />
-    <ClInclude Include="..\..\src\parsing\parsing.h" />
+    <ClInclude Include="..\..\src\core\fuckmake.h" />
     <ClInclude Include="..\..\src\util\dirent.h" />
     <ClInclude Include="..\..\src\util\list.h" />
     <ClInclude Include="..\..\src\util\string.h" />
