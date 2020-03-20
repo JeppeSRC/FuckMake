@@ -1,6 +1,7 @@
 #include "fuckmake.h"
 
 #include <util/util.h>
+#include <parsing/parsing.h>
 
 FuckMake::FuckMake(const String& rootDir, const String& filename, const String& target) : rootDir(rootDir), rootSet(false) {
 	omp_init_lock(&msgMutex);
@@ -381,9 +382,11 @@ void FuckMake::ProcessMsg(String& string) {
 void FuckMake::ProcessExecuteList(String& string) {
 	uint64 firstComma = string.Find(',');
 	uint64 secondComma = string.Find(',', firstComma + 1);
+	uint64 thirdComma = string.Find(',', secondComma + 1);
 
 	String files;
 	String outdir;
+	String includeDirs;
 
 	String a = string.SubString(0, firstComma - 1).RemoveWhitespace();
 	Action* action = GetAction(a);
@@ -394,7 +397,15 @@ void FuckMake::ProcessExecuteList(String& string) {
 	}
 
 	files = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
-	outdir = string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
+
+	if (thirdComma == String::npos) {
+		thirdComma = string.length;
+		includeDirs = "";
+	} else {
+		includeDirs = string.SubString(thirdComma + 1, string.length - 1).RemoveWhitespace(true);
+	}
+
+	outdir = string.SubString(secondComma + 1, thirdComma - 1).RemoveWhitespace(true);
 
 	Log(LogLevel::Debug, "ExecuteList(%s,%s,%s)", a.str, files.str, outdir.str);
 
@@ -408,6 +419,8 @@ void FuckMake::ProcessExecuteList(String& string) {
 
 	uint64 count = file.GetCount();
 
+	List<String> dirs = includeDirs.Split("|");
+
 #pragma omp parallel for schedule(dynamic)
 	for (uint64 i = 0; i < count; i++) {
 		String outFile = outdir + file[i].filename + ".obj";
@@ -415,8 +428,10 @@ void FuckMake::ProcessExecuteList(String& string) {
 		struct stat fInfo;
 		if (stat(outFile.str, &fInfo) >= 0) {
 			if (file[i].fInfo.st_mtime <= fInfo.st_mtime) {
-				Log(LogLevel::Debug, "Skipping file \"%s\"", file[i].filename.str);
-				continue;
+				if (!CheckIncludes(file[i].filename, dirs, fInfo)) {
+					Log(LogLevel::Debug, "Skipping file \"%s\"", file[i].filename.str);
+					continue;
+				}
 			}
 		} else {
 			CreateFolderAndFile(outFile.str);

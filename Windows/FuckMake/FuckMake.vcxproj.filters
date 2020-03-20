@@ -11,6 +11,9 @@
     <ClCompile Include="..\..\src\core\fuckmake.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\parsing\parsing.cpp">
+      <Filter>parsing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="core">
@@ -41,6 +44,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\core\fuckmake.h">
       <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\parsing\parsing.h">
+      <Filter>parsing</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
