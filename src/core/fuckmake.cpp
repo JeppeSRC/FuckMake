@@ -299,7 +299,7 @@ void FuckMake::ProcessGetFiles(String& string) {
 	uint64 firstComma = string.Find(',');
 	uint64 secondComma = string.Find(',', firstComma + 1);
 
-	String directory("");
+	String directory("./");
 	String wildcard("*");
 	String exclusion;
 
@@ -323,6 +323,10 @@ void FuckMake::ProcessGetFiles(String& string) {
 
 	List<String> files = ScanDirectory(directory);
 
+	if (firstComma == 0) {
+		directory.Remove("./");
+	}
+
 	Log(LogLevel::Debug, "GetFiles(%s,%s,%s):", directory.str, wildcard.str, exclusion.str);
 
 	List<String> wildcards = wildcard.Split(" ");
@@ -330,9 +334,11 @@ void FuckMake::ProcessGetFiles(String& string) {
 
 	for (uint64 i = 0; i < files.GetCount(); i++) {
 		String& file = files[i];
-
 		bool included = false;
 
+		if (firstComma == 0)
+			file.Remove("./");
+ 
 		for (uint64 j = 0; j < wildcards.GetCount(); j++) {
 			if (CheckWildcardPattern(file, wildcards[j])) {
 				included = true;
