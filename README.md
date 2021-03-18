@@ -83,7 +83,7 @@ Defines an action which can be executed with [Execute](#execute). Actions define
 
 ### Execute
 
-There are two types of execute functions, [ExecuteList](#executelist) and [Execute](#executesingle)
+There are three types of execute functions, [Execute](#executesingle), [ExecuteList](#executelist) and [ExecuteTarget](#executetarget)
 
 ### Targets
 
@@ -145,3 +145,9 @@ If `IncludeDir` contains the list of include directories it will scan source fil
 -   `OutDir` Same as [ExecuteList](#executelist)
 
 Same as [ExecuteList](#executelist) except that it's only executed once and `%Input` will be a list of `Files` separated by spaces.
+
+### ExecuteTarget
+
+`ExecuteTarget(Target)`
+
+-   `Target` Specifies which target to run.
