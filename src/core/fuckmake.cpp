@@ -13,7 +13,7 @@ FuckMake::FuckMake(const String& rootDir, const String& filename, const String& 
 		Log(LogLevel::Error, "Failed to open Fuckfile");
 		exit(1);
 	}
-	
+
 	variables.Reserve(1024);
 	actions.Reserve(1024);
 	targets.Reserve(1024);
@@ -344,7 +344,7 @@ void FuckMake::ProcessGetFiles(String& string) {
 
 		if (firstComma == 0)
 			file.Remove("./");
- 
+
 		for (uint64 j = 0; j < wildcards.GetCount(); j++) {
 			if (CheckWildcardPattern(file, wildcards[j])) {
 				included = true;
@@ -383,7 +383,7 @@ void FuckMake::ProcessDeleteFiles(String& string) {
 void FuckMake::ProcessMsg(String& string) {
 	ProcessVariables(string);
 	ProcessFunctions(string);
-	
+
 	omp_set_lock(&msgMutex);
 	Log(LogLevel::Info, "%s", string.str);
 	omp_unset_lock(&msgMutex);
@@ -449,7 +449,7 @@ void FuckMake::ProcessExecuteList(String& string) {
 			CreateFolderAndFile(outFile.str);
 		}
 
-			
+
 		for (uint64 j = 0; j < actions.GetCount(); j++) {
 			String ac = actions[j];
 			ProcessVariables(ac);
@@ -512,7 +512,7 @@ void FuckMake::ProcessExecute(String& string) {
 	}
 
 	List<String>& actions = action->actions;
-	
+
 	for (uint64 i = 0; i < actions.GetCount(); i++) {
 		String ac = actions[i];
 		ProcessVariables(ac);

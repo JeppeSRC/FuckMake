@@ -63,7 +63,7 @@ bool CheckInclude(String currentFile, const String& include, const List<String>&
 			}
 		}
 	}
-	
+
 	return false;
 }
 
@@ -105,7 +105,7 @@ bool CheckIncludes(const String& filename, const List<String>& includeDirs, stru
 		} else if (num == 0) {
 			uint64 start = file.Find("<", index);
 			uint64 end = file.Find(">", index);
-			
+
 			if (start > newLine || end > newLine) {
 				Error(filename);
 			}
