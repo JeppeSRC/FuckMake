@@ -32,14 +32,7 @@ FuckMake::FuckMake(const String& rootDir, const String& filename, const String& 
 		exit(1);
 	}
 
-	List<String>& ts = t->targets;
-
-	Log(LogLevel::Debug, "Executing target \"%s\"", t->name.str);
-	for (uint64 i = 0; i < ts.GetCount(); i++) {
-		String s = ts[i];
-		ProcessVariables(s);
-		ProcessFunctions(s);
-	}
+	ProcessTarget(t);
 
 	omp_destroy_lock(&msgMutex);
 }
@@ -218,6 +211,8 @@ void FuckMake::ProcessFunctions(String& string) {
 			ProcessExecuteList(tmp);
 		} else if (functionName == "Execute") {
 			ProcessExecute(tmp);
+		} else if (functionName == "ExecuteTarget") {
+			ProcessExecuteTarget(tmp);
 		}
 
 		string.Insert(start, closingParenthesis, tmp);
@@ -233,6 +228,17 @@ void FuckMake::ProcessInputOuput(String& string, const String& input, const Stri
 
 	while ((index = string.Find("%Output")) != String::npos) {
 		string.Insert(index, index + 6, output);
+	}
+}
+
+void FuckMake::ProcessTarget(const Target* target) {
+	const List<String>& ts = target->targets;
+
+	Log(LogLevel::Debug, "Executing target \"%s\"", target->name.str);
+	for (uint64 i = 0; i < ts.GetCount(); i++) {
+		String s = ts[i];
+		ProcessVariables(s);
+		ProcessFunctions(s);
 	}
 }
 
@@ -519,6 +525,17 @@ void FuckMake::ProcessExecute(String& string) {
 
 		system(ac.SubString(index + 1, ac.length - 1).str);
 	}
+}
+
+void FuckMake::ProcessExecuteTarget(String& string) {
+	Target* target = GetTarget(string);
+
+	if (target == nullptr) {
+		Log(LogLevel::Error, "No target named \"%s\"", string.str);
+		exit(1);
+	}
+
+	ProcessTarget(target);
 }
 
 uint64 FuckMake::FindMatchingParenthesis(const String& string, uint64 start) {

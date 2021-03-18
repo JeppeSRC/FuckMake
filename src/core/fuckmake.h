@@ -35,6 +35,7 @@ private:
 	void ProcessVariables(String& string);
 	void ProcessFunctions(String& string);
 	void ProcessInputOuput(String& string, const String& input, const String& output);
+	void ProcessTarget(const Target* target);
 
 	bool CheckWildcardPattern(const String& source, const String& pattern);
 
@@ -43,6 +44,7 @@ private:
 	void ProcessMsg(String& string);
 	void ProcessExecuteList(String& string);
 	void ProcessExecute(String& string);
+	void ProcessExecuteTarget(String& string);
 
 	uint64 FindMatchingParenthesis(const String& string, uint64 start);
 
