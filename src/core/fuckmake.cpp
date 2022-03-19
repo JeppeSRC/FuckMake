@@ -187,7 +187,7 @@ void FuckMake::ProcessFunctions(String& string) {
 	while ((parenthesis = string.Find('(', parenthesis + 1)) != String::npos) {
 		if (string[parenthesis - 1] == '%') continue;
 
-		uint64 start = string.FindReversedOr(" \n\r\t)(=,", parenthesis-1)+1;
+		uint64 start = string.FindReversedOr(" |\n\r\t)(=,", parenthesis-1)+1;
 
 		uint64 end = parenthesis - 1;
 
