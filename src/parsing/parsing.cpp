@@ -74,6 +74,10 @@ bool CheckIncludes(const String& filename, const List<String>& includeDirs, stru
 	if (buffer == nullptr) {
 		Log(LogLevel::Error, "CheckIncludes: \"%s\" doesn't exist", filename.str);
 		exit(1);
+	} else if (size == 0) {
+		Log(LogLevel::Debug, "CheckIncludes: \"%s\" is empty, skipping", filename.str);
+		delete[] buffer;
+		return false;
 	}
 
 	String file((const char* const)buffer, size);
