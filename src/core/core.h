@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define ASSERT(x) if (!(x)) {uint8* _abcd = 0; (*_abcd) = 0; printf("Assertion Failed: %s\n", #x);}
 #else
 #define ASSERT(x)
