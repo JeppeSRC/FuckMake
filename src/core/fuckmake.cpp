@@ -303,7 +303,7 @@ bool FuckMake::CheckWildcardPattern(const String& source, const String& pattern)
 
 void FuckMake::ProcessGetFiles(String& string) {
 	List<String> args = SplitArgumentList(string);
-	string.Remove(0, string.length - 1);
+	string.Remove(0, string.length-1);
 
 	String arr[3]; 
 
@@ -376,39 +376,44 @@ void FuckMake::ProcessMsg(String& string) {
 }
 
 void FuckMake::ProcessExecuteList(String& string) {
-	uint64 firstComma = string.Find(',');
-	uint64 secondComma = string.Find(',', firstComma + 1);
-	uint64 thirdComma = string.Find(',', secondComma + 1);
+	List<String> args = SplitArgumentList(string);
 
-	String files;
-	String outdir;
-	String includeDirs;
-
-	String a = string.SubString(0, firstComma - 1).RemoveWhitespace();
-	Action* action = GetAction(a);
-
-	if (secondComma - firstComma == 1) {
-		Log(LogLevel::Error, "No input files to action \"%s\"", a.str);
+	if (args.GetCount() < 3) {
+		Log(LogLevel::Error, "ExecuteList() requires at least 3 arguments");
+		exit(1);
+	} else if (args.GetCount() > 4) {
+		Log(LogLevel::Error, "ExecuteList() only takes max 4 arguments");
 		exit(1);
 	}
 
-	files = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
+	String arr[4];
 
-	if (thirdComma == String::npos) {
-		thirdComma = string.length;
-		includeDirs = "";
-	} else {
-		includeDirs = string.SubString(thirdComma + 1, string.length - 1).RemoveWhitespace(true);
+	String& actionName = arr[0];
+	String& files = arr[1];
+	String& outdir = arr[2];
+	String& includeDirs = arr[3];
+
+	for (uint64 i = 0; i < args.GetCount(); i++) {
+		arr[i] = args[i];
 	}
 
-	outdir = string.SubString(secondComma + 1, thirdComma - 1).RemoveWhitespace(true);
+	Action* action = GetAction(actionName);
 
-	Log(LogLevel::Debug, "ExecuteList(%s,%s,%s)", a.str, files.str, outdir.str);
-
-	if (!action) {
-		Log(LogLevel::Error, "No action named \"%s\"", a.str);
+	if (action == nullptr) {
+		Log(LogLevel::Error, "No action named \"%s\"", actionName.str);
 		exit(1);
 	}
+
+	if (files.length == 0) {
+		Log(LogLevel::Error, "No input files to action \"%s\"", actionName.str);
+		exit(1);
+	}
+
+	files.RemoveWhitespace(true);
+	includeDirs.RemoveWhitespace(true);
+	outdir.RemoveWhitespace(true);
+
+	Log(LogLevel::Debug, "ExecuteList(%s,%s,%s)", actionName.str, files.str, outdir.str);
 
 	List<String>& actions = action->actions;
 	List<FileInfo> file = GetFileInfo(files);
@@ -450,26 +455,42 @@ void FuckMake::ProcessExecuteList(String& string) {
 }
 
 void FuckMake::ProcessExecute(String& string) {
-	uint64 firstComma = string.Find(',');
-	uint64 secondComma = string.Find(',', firstComma + 1);
+	List<String> args = SplitArgumentList(string);
 
-	String file;
-	String outdir;
-
-	String a = string.SubString(0, firstComma - 1).RemoveWhitespace();
-	Action* action = GetAction(a);
-
-	if (secondComma - firstComma == 1) {
-		Log(LogLevel::Error, "No input files to action \"%s\"", a.str);
+	if (args.GetCount() != 3) {
+		Log(LogLevel::Error, "Execute() requires 3 arguments");
 		exit(1);
 	}
 
-	file = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
-	outdir = string.SubString(secondComma + 1, string.length - 1).RemoveWhitespace(true);
+	String arr[3];
 
-	Log(LogLevel::Debug, "Execute(%s,%s,%s)", a.str, file.str, outdir.str);
+	String& actionName = arr[0];
+	String& fileList = arr[1];
+	String& outdir = arr[2];
 
-	List<FileInfo> files = GetFileInfo(file);
+	for (uint64 i = 0; i < args.GetCount(); i++) {
+		arr[i] = args[i];
+	}
+
+	Action* action = GetAction(actionName);
+
+	if (action == nullptr) {
+		Log(LogLevel::Error, "No action named \"%s\"", actionName.str);
+		exit(1);
+	}
+
+	if (fileList.length == 0) {
+		Log(LogLevel::Error, "No input files to action \"%s\"", actionName.str);
+		exit(1);
+	}
+
+
+	fileList.RemoveWhitespace(true);
+	outdir.RemoveWhitespace(true);
+
+	Log(LogLevel::Debug, "Execute(%s,%s,%s)", actionName.str, fileList.str, outdir.str);
+
+	List<FileInfo> files = GetFileInfo(fileList);
 
 	struct stat fInfo;
 	if (stat(outdir.str, &fInfo) >= 0) {
@@ -485,7 +506,7 @@ void FuckMake::ProcessExecute(String& string) {
 	}
 
 	if (!action) {
-		Log(LogLevel::Error, "No action named \"%s\"", a.str);
+		Log(LogLevel::Error, "No action named \"%s\"", actionName.str);
 		exit(1);
 	}
 
