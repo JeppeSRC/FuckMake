@@ -4,12 +4,27 @@
 #include <core/fuckmake.h>
 #include <util/util.h>
 
+bool ProcessArgument(const String& arg) {
+	if (arg == "-dmsg") {
+		FuckMake::PrintDebugMessages = true;
+		return true;
+	}
+
+	return false;
+}
+
 int main(int argc, char** argv) {
 	String target("__default__");
 
-	if (argc >= 2) {
-		target = argv[1];
-	}
+	for (int i = 1; i < argc; i++) {
+		if (!ProcessArgument(argv[i])) {
+			if (target != "__default__"){
+				Log(LogLevel::Warning, "Warning: target already set \"%s\" overwriting with \"%s\"", target.str, argv[i]);
+			}
+
+			target = argv[i];
+		}
+	} 
 
 	Log(LogLevel::Debug, "Starting FuckMake");
 

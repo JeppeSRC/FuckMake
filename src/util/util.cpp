@@ -1,5 +1,6 @@
 #include "util.h"
 #include <stdarg.h>
+#include <core/fuckmake.h>
 
 uint8* ReadFile(const String& filename, uint64* size) {
 	ASSERT(size != 0);
@@ -136,9 +137,11 @@ void Log(LogLevel level, const char* message, ...) {
 		SetColor(COLOR_INFO);
 		break;
 	case LogLevel::Debug:
+		if (!FuckMake::PrintDebugMessages) {
 #ifndef _DEBUG
 		return;
 #endif
+		}
 		SetColor(COLOR_DEBUG);
 		break;
 	case LogLevel::Warning:

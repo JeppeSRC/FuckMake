@@ -3,6 +3,8 @@
 #include <util/util.h>
 #include <parsing/parsing.h>
 
+bool FuckMake::PrintDebugMessages = false;
+
 FuckMake::FuckMake(const String& rootDir, const String& filename, const String& target) : rootDir(rootDir), rootSet(false) {
 	omp_init_lock(&msgMutex);
 	Log(LogLevel::Debug, "Loading Fuckfile");

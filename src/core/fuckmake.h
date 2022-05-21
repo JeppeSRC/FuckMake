@@ -59,6 +59,10 @@ private:
 
 	String rootDir;
 	bool rootSet;
+
+public:
+	static bool PrintDebugMessages;
+
 public:
 	FuckMake(const String& rootDir, const String& filename, const String& target);
 };
