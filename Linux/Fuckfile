@@ -33,19 +33,22 @@ Link {
 
 debug:
     ExecuteList(Compile_dbg, %(CFILES), %(ObjDirDbg)/,src/)
-    Execute(Link, GetFiles(%(ObjDirDbg),*.obj,), %(OutDir)FuckMake)
+    Execute(Link, GetFiles(%(ObjDirDbg),*.obj), %(OutDir)FuckMake)
 
 release:
     ExecuteList(Compile, %(CFILES), %(ObjDir),src/)
-    Execute(Link, GetFiles(%(ObjDir),*.obj,), %(OutDir)FuckMake)
+    Execute(Link, GetFiles(%(ObjDir),*.obj), %(OutDir)FuckMake)
 
 
 debug_rebuild:
     DeleteFiles(GetFiles(%(ObjDirDbg),*.obj,))
     ExecuteList(Compile_dbg, %(CFILES), %(ObjDirDbg))
-    Execute(Link, GetFiles(%(ObjDirDbg),*.obj,), %(OutDir)FuckMake)
+    Execute(Link, GetFiles(%(ObjDirDbg),*.obj), %(OutDir)FuckMake)
     
 release_rebuild:
-    DeleteFiles(GetFiles(%(ObjDir),*.obj,))
+    DeleteFiles(GetFiles(%(ObjDir),*.obj))
     ExecuteList(Compile, %(CFILES), %(ObjDir))
-    Execute(Link, GetFiles(%(ObjDir),*.obj,), %(OutDir)FuckMake)
+    Execute(Link, GetFiles(%(ObjDir),*.obj), %(OutDir)FuckMake)
+
+clean:
+    DeleteFiles(GetFiles(%(OutDir)))
