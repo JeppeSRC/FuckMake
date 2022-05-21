@@ -447,3 +447,11 @@ bool String::operator==(const char* const string) const {
 
 	return true;
 }
+
+bool String::operator!=(const String& string) const {
+	return !operator==(string);
+}
+
+bool String::operator!=(const char* const string) const {
+	return !operator==(string);
+}

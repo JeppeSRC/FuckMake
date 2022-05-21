@@ -83,4 +83,7 @@ public:
 
 	bool operator==(const String& string) const;
 	bool operator==(const char* const string) const;
+
+	bool operator!=(const String& string) const;
+	bool operator!=(const char* const string) const;
 };
