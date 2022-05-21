@@ -9,6 +9,7 @@
 #include <Windows.h>
 #else
 #include <unistd.h>
+#include <cstdlib>
 #endif
 
 #define CLAMP(x, min, max) (x > max ? max : (x < min ? min : x))
