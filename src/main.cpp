@@ -14,11 +14,11 @@ bool ProcessArgument(const String& arg) {
 }
 
 int main(int argc, char** argv) {
-	String target("__default__");
+	String target = FuckMake::DefaultTargetName;
 
 	for (int i = 1; i < argc; i++) {
 		if (!ProcessArgument(argv[i])) {
-			if (target != "__default__"){
+			if (target != FuckMake::DefaultTargetName){
 				Log(LogLevel::Warning, "Warning: target already set \"%s\" overwriting with \"%s\"", target.str, argv[i]);
 			}
 
@@ -42,7 +42,13 @@ int main(int argc, char** argv) {
 		path.Append("/");
 	}
 
-	FuckMake fMake(path, "Fuckfile", target);
+	FuckMake::InitLock();
+
+	FuckMake fMake(path, "Fuckfile");
+
+	fMake.Run(target);
+
+	FuckMake::DestroyLock();
 
 	return 0;
 }

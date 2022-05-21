@@ -45,6 +45,7 @@ private:
 	void ProcessExecuteList(String& string);
 	void ProcessExecute(String& string);
 	void ProcessExecuteTarget(String& string);
+	void ProcessCall(String& string);
 
 	uint64 FindMatchingParenthesis(const String& string, uint64 start);
 	List<String> SplitArgumentList(const String& string);
@@ -55,14 +56,19 @@ private:
 	Action* GetAction(const String& name);
 	Target* GetTarget(const String& name);
 
-	omp_lock_t msgMutex;
-
 	String rootDir;
 	bool rootSet;
 
 public:
 	static bool PrintDebugMessages;
+	static omp_lock_t msgMutex;
+	static String DefaultTargetName;
 
 public:
-	FuckMake(const String& rootDir, const String& filename, const String& target);
+	FuckMake(const String& rootDir, const String& filename);
+
+	void Run(const String& target);
+
+	static void InitLock();
+	static void DestroyLock();
 };

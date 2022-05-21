@@ -4,10 +4,11 @@
 #include <parsing/parsing.h>
 
 bool FuckMake::PrintDebugMessages = false;
+omp_lock_t FuckMake::msgMutex;
+String FuckMake::DefaultTargetName("__default__");
 
-FuckMake::FuckMake(const String& rootDir, const String& filename, const String& target) : rootDir(rootDir), rootSet(false) {
-	omp_init_lock(&msgMutex);
-	Log(LogLevel::Debug, "Loading Fuckfile");
+FuckMake::FuckMake(const String& rootDir, const String& filename) : rootDir(rootDir), rootSet(false) {
+	Log(LogLevel::Debug, "Loading Fuckfile -> \"%s\"", filename.str);
 	uint64 size = 0;
 	uint8* data = ReadFile(filename.str, &size);
 
@@ -26,16 +27,17 @@ FuckMake::FuckMake(const String& rootDir, const String& filename, const String& 
 
 	Log(LogLevel::Debug, "Parsing...");
 	Parse(string);
+}
 
-	Target* t = GetTarget(target);
+void FuckMake::Run(const String& target) {
+	ProcessExecuteTarget(const_cast<String&>(target));
+}
 
-	if (!t) {
-		Log(LogLevel::Error, "No target named \"%s\"", target.str);
-		exit(1);
-	}
+void FuckMake::InitLock() {
+	omp_init_lock(&msgMutex);
+}
 
-	ProcessTarget(t);
-
+void FuckMake::DestroyLock() {
 	omp_destroy_lock(&msgMutex);
 }
 
@@ -215,6 +217,8 @@ void FuckMake::ProcessFunctions(String& string) {
 			ProcessExecute(tmp);
 		} else if (functionName == "ExecuteTarget") {
 			ProcessExecuteTarget(tmp);
+		} else if (functionName == "Call") {
+			ProcessCall(tmp);
 		}
 
 		string.Insert(start, closingParenthesis, tmp);
@@ -255,6 +259,7 @@ bool FuckMake::CheckWildcardPattern(const String& source, const String& pattern)
 	uint64 numAsterix = pattern.Count("*");
 
 	if (numAsterix == 1) {
+		if (pattern.length == 1) return true;
 		if (previous == 0) {
 			if (source.EndsWith(pattern.SubString(1, pattern.length - 1))) {
 				return true;
@@ -370,9 +375,9 @@ void FuckMake::ProcessMsg(String& string) {
 	ProcessVariables(string);
 	ProcessFunctions(string);
 
-	omp_set_lock(&msgMutex);
+	omp_set_lock(&FuckMake::msgMutex);
 	Log(LogLevel::Info, "%s", string.str);
-	omp_unset_lock(&msgMutex);
+	omp_unset_lock(&FuckMake::msgMutex);
 
 	string.Remove(0, string.length - 1);
 }
@@ -535,6 +540,27 @@ void FuckMake::ProcessExecuteTarget(String& string) {
 	}
 
 	ProcessTarget(target);
+}
+
+void FuckMake::ProcessCall(String& string) {
+	List<String> args = SplitArgumentList(string);
+
+	if (args.GetCount() == 0) {
+		Log(LogLevel::Error, "Call needs at least on argument");
+		exit(1);
+	} else if (args.GetCount() > 2) {
+		Log(LogLevel::Error, "Call takes no more than 2 arguments");
+		exit(1);
+	}
+
+	const String& path = args[0].RemoveWhitespace(true);
+	const String& target = (args.GetCount() > 1 ? args[1] : FuckMake::DefaultTargetName).RemoveWhitespace(true);
+
+	Log(LogLevel::Debug, "Calling target \"%s\" in Fuckfile \"%s\"", target.str, path.str);
+
+	FuckMake fMake(rootDir, path);
+
+	fMake.Run(target);
 }
 
 uint64 FuckMake::FindMatchingParenthesis(const String& string, uint64 start) {
