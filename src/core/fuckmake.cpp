@@ -388,15 +388,13 @@ void FuckMake::ProcessExecuteList(String& string) {
 		exit(1);
 	}
 
-	String arr[4];
+	String& actionName = args[0];
+	String& files = args[1];
+	String& outdir = args[2];
+	String includeDirs;
 
-	String& actionName = arr[0];
-	String& files = arr[1];
-	String& outdir = arr[2];
-	String& includeDirs = arr[3];
-
-	for (uint64 i = 0; i < args.GetCount(); i++) {
-		arr[i] = args[i];
+	if (args.GetCount() > 3) {
+		includeDirs = args[3];
 	}
 
 	Action* action = GetAction(actionName);
@@ -464,15 +462,9 @@ void FuckMake::ProcessExecute(String& string) {
 		exit(1);
 	}
 
-	String arr[3];
-
-	String& actionName = arr[0];
-	String& fileList = arr[1];
-	String& outdir = arr[2];
-
-	for (uint64 i = 0; i < args.GetCount(); i++) {
-		arr[i] = args[i];
-	}
+	String& actionName = args[0];
+	String& fileList = args[1];
+	String& outdir = args[2];
 
 	Action* action = GetAction(actionName);
 
