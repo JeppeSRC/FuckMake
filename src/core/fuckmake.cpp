@@ -302,36 +302,20 @@ bool FuckMake::CheckWildcardPattern(const String& source, const String& pattern)
 }
 
 void FuckMake::ProcessGetFiles(String& string) {
-	uint64 firstComma = string.Find(',');
-	uint64 secondComma = string.Find(',', firstComma + 1);
-
-	String directory("./");
-	String wildcard("*");
-	String exclusion;
-
-	if (firstComma > 0) {
-		directory = string.SubString(0, firstComma-1);
-	}
-
-	if (secondComma - firstComma > 1) {
-		wildcard = string.SubString(firstComma + 1, secondComma - 1).RemoveWhitespace(true);
-	}
-
-	if (secondComma < string.length - 1) {
-		exclusion = string.SubString(secondComma + 1, string.length - 1);
-	}
-
-	if (!directory.EndsWith("/") && directory.length != 0) {
-		directory.Append("/");
-	}
-
+	List<String> args = SplitArgumentList(string);
 	string.Remove(0, string.length - 1);
 
-	List<String> files = ScanDirectory(directory);
+	String arr[3]; 
 
-	if (firstComma == 0) {
-		directory.Remove("./");
+	String& directory = arr[0] = "./";
+	String& wildcard = arr[1] = "*";
+	String& exclusion = arr[2];
+
+	for (uint64 i = 0; i < args.GetCount(); i++) {
+		arr[i] = args[i];
 	}
+
+	List<String> files = ScanDirectory(directory);
 
 	Log(LogLevel::Debug, "GetFiles(%s,%s,%s):", directory.str, wildcard.str, exclusion.str);
 
@@ -342,7 +326,7 @@ void FuckMake::ProcessGetFiles(String& string) {
 		String& file = files[i];
 		bool included = false;
 
-		if (firstComma == 0)
+		if (directory == "./")
 			file.Remove("./");
 
 		for (uint64 j = 0; j < wildcards.GetCount(); j++) {
@@ -550,6 +534,31 @@ uint64 FuckMake::FindMatchingParenthesis(const String& string, uint64 start) {
 	}
 
 	return String::npos;
+}
+
+List<String> FuckMake::SplitArgumentList(const String& string) {
+	List<String> res;
+
+	uint64 lastIndex = 0;
+
+	for (uint64 i = 0; i < string.length; i++) {
+		if (string[i] == ',') {
+			if (i == lastIndex) {
+				res.Emplace("");
+				lastIndex = i+1;
+			} else {
+				res.Emplace(string.SubString(lastIndex, i-1));
+				lastIndex = i+1;
+			}
+		}
+	}
+
+
+	if (lastIndex < string.length) {
+		res.Emplace(string.SubString(lastIndex, string.length-1));
+	}
+	
+	return res;
 }
 
 void FuckMake::InitializeBuiltinVaraibles() {

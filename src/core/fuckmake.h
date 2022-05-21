@@ -47,6 +47,7 @@ private:
 	void ProcessExecuteTarget(String& string);
 
 	uint64 FindMatchingParenthesis(const String& string, uint64 start);
+	List<String> SplitArgumentList(const String& string);
 
 	void InitializeBuiltinVaraibles();
 
