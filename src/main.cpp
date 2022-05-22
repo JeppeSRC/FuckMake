@@ -1,13 +1,33 @@
 #include <stdio.h>
+#include <string>
 #include <core/core.h>
 
 #include <core/fuckmake.h>
 #include <util/util.h>
 
+#define FUCKMAKE_VERSION "V1.33"
+
+void PrintVersion() {
+	String version;
+
+#ifdef _MSC_VER
+	version = String("MSVC ") + std::to_string(_MSC_VER).c_str();
+#elif defined(__VERSION__)
+	version = String("g++ ") + __VERSION__;
+#else
+	version = "Unknown";
+#endif
+
+	printf("FuckMake: %s\nBuild: %s (%s)\n", FUCKMAKE_VERSION, __DATE__, version.str);
+}
+
 bool ProcessArgument(const String& arg) {
 	if (arg == "-dmsg") {
 		FuckMake::PrintDebugMessages = true;
 		return true;
+	} if (arg == "--version") {
+		PrintVersion();
+		exit(0);
 	}
 
 	return false;
